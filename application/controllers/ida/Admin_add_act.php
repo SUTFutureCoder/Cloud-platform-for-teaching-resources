@@ -31,8 +31,8 @@ class Admin_add_act extends CI_Controller{
     */
     public function Index(){
         $this->load->library('session');
-        $this->load->library('authorizee');
-        $this->load->model('question_model');
+        $this->load->library('ida/authorizee');
+        $this->load->model('ida/question_model');
         
         if (!$this->authorizee->CheckAuthorizee($this->session->userdata('user_role'), 'person_add')){
             header("Content-type: text/html; charset=utf-8");
@@ -42,7 +42,7 @@ class Admin_add_act extends CI_Controller{
         
         $type = $this->question_model->getQuestionType();
         
-        $this->load->view('admin_add_act_view', array(
+        $this->load->view('ida/admin_add_act_view', array(
                     'type' => $type
                 ));
     }
@@ -61,11 +61,11 @@ class Admin_add_act extends CI_Controller{
      *  
     */
     public function addAct(){
-        $this->load->model('act_model');
-        $this->load->library('authorizee');
+        $this->load->model('ida/act_model');
+        $this->load->library('ida/authorizee');
         $this->load->library('session');
-        $this->load->library('cache');
-        $this->load->library('secure');
+        $this->load->library('ida/cache');
+        $this->load->library('ida/secure');
         
         if (!$this->authorizee->CheckAuthorizee($this->session->userdata('user_role'), 'question_add')){
             echo json_encode(array('code' => -1, 'error' => '抱歉，您的权限不足'));

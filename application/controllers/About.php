@@ -32,7 +32,7 @@ class About extends CI_Controller{
     */
     public function index(){
         $this->load->library('session');
-        $this->load->view('about_view');
+        $this->load->view('ida/about_view');
     }
    
 }

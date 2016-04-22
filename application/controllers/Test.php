@@ -30,10 +30,10 @@ class Test extends CI_Controller{
     */
     public function Paper(){
         $this->load->library('session');
-        $this->load->library('cache');
-        $this->load->model('act_model');
-        $this->load->model('answer_model');
-        $this->load->model('question_model');
+        $this->load->library('ida/cache');
+        $this->load->model('ida/act_model');
+        $this->load->model('ida/answer_model');
+        $this->load->model('ida/question_model');
         
         if (!$this->session->userdata('user_id')){
             header("Content-type: text/html; charset=utf-8");
@@ -74,7 +74,7 @@ class Test extends CI_Controller{
                 }
                 $history_question_data = $this->setMulti($mc->getMulti($history_question_list, $null, Memcached::GET_PRESERVE_ORDER));
                 
-                $this->load->view('test_view', array('history' => 1, 
+                $this->load->view('ida/test_view', array('history' => 1,
                     'question_data_list' => $history_question_data,
                     'user_act_data' => $history_answer));
                 return 0;
@@ -100,14 +100,14 @@ class Test extends CI_Controller{
                 $act_statis = array();
                 $act_statis = $this->act_model->getActStatisById($this->input->post('act_id', TRUE));
                 
-                $this->load->view('test_view', array('answer_fin' => 1, 'history' => $history, 'act_info' => $act_info, 'ranking' => $rank, 'act_statis' => $act_statis));
+                $this->load->view('ida/test_view', array('answer_fin' => 1, 'history' => $history, 'act_info' => $act_info, 'ranking' => $rank, 'act_statis' => $act_statis));
                 return 0;
             }
         }
         
         //检查是否在答题时间范围内
         if ($act_data['act_start'] > date('Y-m-d H:i:s') || $act_data['act_end'] < date('Y-m-d H:i:s')){
-            $this->load->view('test_view', array('out_of_time' => 1));
+            $this->load->view('ida/test_view', array('out_of_time' => 1));
             return 0;
         }
         
@@ -156,7 +156,7 @@ class Test extends CI_Controller{
         }
         $db_data['left_time'] = strtotime($db_data['end_time']) - time();
         //显示答题界面
-        $this->load->view('test_view', array('new_act' => 1,
+        $this->load->view('ida/test_view', array('new_act' => 1,
             'question_data_list' => $question_data_list,
             'user_act_data' => $db_data));
     }
@@ -174,10 +174,10 @@ class Test extends CI_Controller{
     */
     public function Investigation(){
         $this->load->library('session');
-        $this->load->library('cache');
-        $this->load->model('act_model');
-        $this->load->model('answer_model');
-        $this->load->model('question_model');
+        $this->load->library('ida/cache');
+        $this->load->model('ida/act_model');
+        $this->load->model('ida/answer_model');
+        $this->load->model('ida/question_model');
         
         if (!$this->session->userdata('user_id')){
             header("Content-type: text/html; charset=utf-8");
@@ -218,7 +218,7 @@ class Test extends CI_Controller{
                 }
                 $history_question_data = $this->setMulti($mc->getMulti($history_question_list, $null, Memcached::GET_PRESERVE_ORDER));
                 
-                $this->load->view('test_view', array('history' => 1, 
+                $this->load->view('ida/test_view', array('history' => 1,
                     'question_data_list' => $history_question_data,
                     'user_act_data' => $history_answer));
                 return 0;
@@ -244,14 +244,14 @@ class Test extends CI_Controller{
                 $act_statis = array();
                 $act_statis = $this->act_model->getActStatisById($this->input->get('act_id', TRUE));
                 
-                $this->load->view('test_view', array('answer_fin' => 1, 'history' => $history, 'act_info' => $act_info, 'ranking' => $rank, 'act_statis' => $act_statis));
+                $this->load->view('ida/test_view', array('answer_fin' => 1, 'history' => $history, 'act_info' => $act_info, 'ranking' => $rank, 'act_statis' => $act_statis));
                 return 0;
             }
         }
         
         //检查是否在答题时间范围内
         if ($act_data['act_start'] > date('Y-m-d H:i:s') || $act_data['act_end'] < date('Y-m-d H:i:s')){
-            $this->load->view('test_view', array('out_of_time' => 1));
+            $this->load->view('ida/test_view', array('out_of_time' => 1));
             return 0;
         }
         
@@ -300,7 +300,7 @@ class Test extends CI_Controller{
         }
         $db_data['left_time'] = strtotime($db_data['end_time']) - time();
         //显示答题界面
-        $this->load->view('test_view', array('new_act' => 1,
+        $this->load->view('ida/test_view', array('new_act' => 1,
             'question_data_list' => $question_data_list,
             'user_act_data' => $db_data));
     }
@@ -318,8 +318,8 @@ class Test extends CI_Controller{
      *  array $data 已被打乱顺序的列表数组
     */
     private function getQuestionIdListByType($question_section, $question_type){
-        $this->load->library('cache');
-        $this->load->model('question_model');
+        $this->load->library('ida/cache');
+        $this->load->model('ida/question_model');
         
         $mc = $this->cache->memcache();
         if (!$data = $mc->get('ida_' . $this->cache->getNS('question_type') . '_' . $question_section . '_' . $question_type)){
@@ -353,8 +353,8 @@ class Test extends CI_Controller{
      *  array $data 完全填充问题列表 
     */
     private function setMulti($item){
-        $this->load->model('question_model');
-        $this->load->library('cache');
+        $this->load->model('ida/question_model');
+        $this->load->library('ida/cache');
         
         $mc = $this->cache->memcache();
         
@@ -396,7 +396,7 @@ class Test extends CI_Controller{
     */
     public function saveAnswer(){
         $this->load->library('session');
-        $this->load->model('answer_model');
+        $this->load->model('ida/answer_model');
         
         
         if (!$this->session->userdata('user_id')){
@@ -456,7 +456,7 @@ class Test extends CI_Controller{
     private function calcScore($user_id, $act_id){
         //防止出现意外，以数据库数据为准
         $this->load->library('session');
-        $this->load->model('answer_model');
+        $this->load->model('ida/answer_model');
         
         $data = $this->answer_model->getUserHistoryAnswer($user_id, $act_id);
         
@@ -503,7 +503,7 @@ class Test extends CI_Controller{
     private function getRank($user_id, $act_id){
         //防止出现意外，以数据库数据为准
         $this->load->library('session');
-        $this->load->model('act_model');
+        $this->load->model('ida/act_model');
         
         $rank = $this->act_model->getUserRank($user_id, $act_id);
         

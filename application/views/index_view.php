@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">    
 
-    <title>工大爱答[Alpha]</title>
+    <title>教学资源云平台</title>
 
     <!-- Bootstrap core CSS -->
     <link href="http://nws.oss-cn-qingdao.aliyuncs.com/bootstrap.min.css" rel="stylesheet">
@@ -31,7 +31,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">爱答[alpha]</a>
+          <a class="navbar-brand" href="#">教学资源云平台</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -64,7 +64,10 @@
         <br/>
         <br/>
         <br/>
-        <div class="alert alert-info" role="alert">正在进行的答题</div>
+        <div class="alert alert-success" role="alert">公开课程</div>
+        <br/>
+
+        <div class="alert alert-info" role="alert">正在进行的课后答题</div>
         <?php if (is_array($act_list)): ?>
         <div class="row">
             <?php foreach ($act_list as $key => $value): ?>

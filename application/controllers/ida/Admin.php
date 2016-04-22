@@ -31,7 +31,7 @@ class Admin extends CI_Controller{
     */
     public function Index(){
         $this->load->library('session');
-        $this->load->library('authorizee');
+        $this->load->library('ida/authorizee');
         
         if (!$this->session->userdata('user_role') || !$this->authorizee->CheckAuthorizee($this->session->userdata('user_role'), 'control_center')){
             header("Content-type: text/html; charset=utf-8");

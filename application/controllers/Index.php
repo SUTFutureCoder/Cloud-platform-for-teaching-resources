@@ -2,10 +2,10 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 /**
- * 爱答入口
+ * 教学云平台
  * 
  *
- * @copyright  版权所有(C) 2015-2015 沈阳工业大学ACM实验室 沈阳工业大学网络管理中心 *Chen
+ * @copyright  版权所有(C) 2016-2016 沈阳工业大学ACM实验室 沈阳工业大学网络管理中心 *Chen
  * @license    http://www.gnu.org/licenses/gpl-3.0.txt   GPL3.0 License
  * @version    0.1
  * @link       https://github.com/SUTFutureCoder 
@@ -30,21 +30,13 @@ class Index extends CI_Controller{
     public function Index()
     {          
         $this->load->library('session');
-        $this->load->library('cache');
-        $this->load->model('act_model');
+        $this->load->library('ida/cache');
+        $this->load->model('ida/act_model');
+//        $this->load->model('lesson_model');
         
-        $mc = $this->cache->memcache();
-        
-        //获取活动列表
-        if (!$data = $mc->get('ida_' . $this->cache->getNS('act') . '_ing_list')){
-            $data = $this->act_model->getActList();
-            //保存一天
-//            $mc->set('ida_' . $this->cache->getNS('act') . '_ing_list', $data, 86400);
-            $mc->set('ida_' . $this->cache->getNS('act') . '_ing_list', $data, 86400);
-        }
-        
+        $data = $this->act_model->getActList();
         $this->load->view('index_view', array(
-            'act_list' => $data   
+            'act_list' => $data
         ));
     }
     
@@ -61,8 +53,8 @@ class Index extends CI_Controller{
     public function setValidateCode(){
         //准备注册/登录
         $this->load->library('session');
-        $this->load->library('ValidateCode');
-        $_vc = new ValidateCode();            
+        $this->load->library('ida/ValidateCode');
+        $_vc = new ValidateCode();
         $_vc->doimg();
         $this->session->set_userdata('authnum_session', $_vc->getCode());
     }
@@ -80,14 +72,14 @@ class Index extends CI_Controller{
     */
     public function checkUserLogin(){
         $this->load->library('session');
-        $this->load->model('user_model');
-        
+        $this->load->model('ida/user_model');
+
         $clean = array();
         
-        //if ($this->session->userdata('authnum_session') != $this->input->post('loginValidateCode', TRUE)){
-        //    echo json_encode(array('code' => -1, 'error' => '验证码不正确'));
-        //    return 0;
-        //}
+        if ($this->session->userdata('authnum_session') != $this->input->post('loginValidateCode', TRUE)){
+            echo json_encode(array('code' => -1, 'error' => '抱歉，您的验证码输入有误'));
+            return 0;
+        }
         
         if (!$this->input->post('loginMobile', TRUE) || 11 != strlen($this->input->post('loginMobile', TRUE))){
             echo json_encode(array('code' => -2, 'error' => '抱歉，您的手机号不合法'));
@@ -134,7 +126,7 @@ class Index extends CI_Controller{
      *  
     */
     public function checkUserRegister(){
-        $this->load->model('user_model');
+        $this->load->model('ida/user_model');
         $this->load->library('encrypt');
         $this->load->library('session');
         
@@ -261,8 +253,8 @@ class Index extends CI_Controller{
     */
     public function getActInfo(){
         $this->load->library('session');
-        $this->load->library('cache');
-        $this->load->model('act_model');
+        $this->load->library('ida/cache');
+        $this->load->model('ida/act_model');
         
         if (!$this->session->userdata('user_id')){
             echo json_encode(array('code' => -1, 'error' => '请您登录后查看'));

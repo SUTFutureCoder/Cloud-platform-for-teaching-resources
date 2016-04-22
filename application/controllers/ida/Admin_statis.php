@@ -3,8 +3,8 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 /**
- * 活动统计、排榜
  * 
+ * 用于各种统计
  * 
  *
  * @copyright  版权所有(C) 2014-2015 沈阳工业大学ACM实验室 沈阳工业大学网络管理中心 *Chen
@@ -12,15 +12,15 @@ if (!defined('BASEPATH'))
  * @version    
  * @link       https://github.com/SUTFutureCoder/
 */
-class Act_statis extends CI_Controller{
-    public function __construct(){
+class Admin_statis extends CI_Controller{
+    
+    function __construct() {
         parent::__construct();
     }
     
-    
     /**    
      *  @Purpose:    
-     *  显示排行榜    
+     *  显示界面    
      *  @Method Name:
      *  Index()    
      *  @Parameter: 
@@ -30,20 +30,18 @@ class Act_statis extends CI_Controller{
     */
     public function Index(){
         $this->load->library('session');
-        $this->load->library('authorizee');
-        $this->load->model('question_model');
+        $this->load->library('ida/authorizee');
+        $this->load->library('ida/ida');
         
-        if (!$this->authorizee->CheckAuthorizee($this->session->userdata('user_role'), 'person_add')){
+        if (!$this->authorizee->CheckAuthorizee($this->session->userdata('user_role'), 'ida_statis')){
             header("Content-type: text/html; charset=utf-8");
             echo '<script>alert("抱歉，您的权限不足");window.location.href="' . base_url() . '";</script>';
             return 0;
         }
         
-        $type = $this->question_model->getQuestionType();
+        $statis = $this->ida->getPlatfromStatis();
         
-        $this->load->view('admin_add_act_view', array(
-                    'type' => $type
-                ));
+        $this->load->view('ida/admin_statis_view', array('statis' => $statis));
     }
-    
 }
+

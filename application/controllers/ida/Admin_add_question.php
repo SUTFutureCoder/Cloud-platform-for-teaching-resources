@@ -30,10 +30,10 @@ class Admin_add_question extends CI_Controller{
     */
     public function Index(){
         $this->load->library('session');
-        $this->load->library('cache');
-        $this->load->library('role');
-        $this->load->library('authorizee');
-        $this->load->model('question_model');
+        $this->load->library('ida/cache');
+        $this->load->library('ida/role');
+        $this->load->library('ida/authorizee');
+        $this->load->model('ida/question_model');
         
         if (!$this->authorizee->CheckAuthorizee($this->session->userdata('user_role'), 'question_add')){
             header("Content-type: text/html; charset=utf-8");
@@ -50,7 +50,7 @@ class Admin_add_question extends CI_Controller{
             $mc->set('ida_' . $this->cache->getNS('question') . '_question_type_list', $question_type_list);
         }
         
-        $this->load->view('admin_add_question_view', array(
+        $this->load->view('ida/admin_add_question_view', array(
             'question_type_list' => $question_type_list
         ));
     }
@@ -67,10 +67,10 @@ class Admin_add_question extends CI_Controller{
      *  
     */
     public function setQuestion(){
-        $this->load->model('question_model');
-        $this->load->library('authorizee');
+        $this->load->model('ida/question_model');
+        $this->load->library('ida/authorizee');
         $this->load->library('session');
-        $this->load->library('cache');
+        $this->load->library('ida/cache');
         
         if (!$this->authorizee->CheckAuthorizee($this->session->userdata('user_role'), 'question_add')){
             echo json_encode(array('code' => -1, 'error' => '抱歉，您的权限不足'));

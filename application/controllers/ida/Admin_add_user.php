@@ -31,8 +31,8 @@ class Admin_add_user extends CI_Controller{
     
     public function Index(){
         $this->load->library('session');
-        $this->load->library('role');
-        $this->load->library('authorizee');
+        $this->load->library('ida/role');
+        $this->load->library('ida/authorizee');
 
         if (!$this->authorizee->CheckAuthorizee($this->session->userdata('user_role'), 'person_add')){
             header("Content-type: text/html; charset=utf-8");
@@ -43,7 +43,7 @@ class Admin_add_user extends CI_Controller{
         //获取角色列表
         $role_list = array();
         $role_list = $this->role->getRoleList();
-        $this->load->view('admin_add_user_view', array(
+        $this->load->view('ida/admin_add_user_view', array(
             'role_list' => $role_list
         ));
     }
@@ -61,9 +61,9 @@ class Admin_add_user extends CI_Controller{
     
     public function addUser(){
         $this->load->library('session');
-        $this->load->library('role');
-        $this->load->library('authorizee');
-        $this->load->model('user_model');
+        $this->load->library('ida/role');
+        $this->load->library('ida/authorizee');
+        $this->load->model('ida/user_model');
         $this->load->library('encrypt');
         
         if (!$this->authorizee->CheckAuthorizee($this->session->userdata('user_role'), 'person_add')){

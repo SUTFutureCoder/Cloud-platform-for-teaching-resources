@@ -24,37 +24,34 @@
 		</div>	</div>
 	<div region="west" border="true" split="true" title="索引" class="cs-west">
                 <div class="easyui-accordion" fit="true" border="false">
+
                         <div title="课程相关">
-                            <a href="javascript:void(0);" src="<?= base_url('index.php/ida/admin_add_question') ?>" class="cs-navi-tab">添加课程</a></p>
-                            <a href="javascript:void(0);" src="../index.php/log/getLogPage" class="cs-navi-tab">课程列表</a></p>
+                            <a href="javascript:void(0);" src="<?= base_url('index.php/admin_add_course') ?>" class="cs-navi-tab">添加课程</a></p>
+
                         </div>
 
                         <div title="答题相关">
-                                <a href="javascript:void(0);" src="<?= base_url('index.php/ida/admin_add_question') ?>" class="cs-navi-tab">添加题目</a></p>
-                                <a href="javascript:void(0);" src="../index.php/log/getLogPage" class="cs-navi-tab">题目列表</a></p>
-                                <a href="javascript:void(0);" src="<?= base_url('index.php/ida/admin_add_act') ?>" class="cs-navi-tab">添加活动</a></p>
-                                <a href="javascript:void(0);" src="index.php/changepass" class="cs-navi-tab">活动列表</a></p>
-                                <a href="javascript:void(0);" src="<?= base_url('index.php/ida/admin_statis') ?>" class="cs-navi-tab">统计</a></p>
+                            <a href="javascript:void(0);" src="<?= base_url('index.php/admin_add_question') ?>" class="cs-navi-tab">添加题目</a></p>
+                            <a href="javascript:void(0);" src="<?= base_url('index.php/admin_question_manage') ?>" class="cs-navi-tab">管理题目/题库</a></p>
+                            <a href="javascript:void(0);" src="<?= base_url('index.php/admin_add_act') ?>" class="cs-navi-tab">添加活动</a></p>
+                            <a href="javascript:void(0);" src="<?= base_url('index.php/admin_act_manage') ?>" class="cs-navi-tab">活动列表</a></p>
                         </div>      
                     
+                        <div title="平台相关">
+                                <a href="javascript:void(0);" src="<?= base_url('index.php/admin_statis') ?>" class="cs-navi-tab">统计</a></p>
+                        </div>      
 
                         <div title="权限相关">
-                                <a href="javascript:void(0);" src="<?= base_url('index.php/ida/admin_add_user')?>" class="cs-navi-tab">添加用户</a></p>
-                                <a href="javascript:void(0);" src="index.php/changepass" class="cs-navi-tab">更改密码</a></p>
-                                <a href="javascript:void(0);" src="<?= base_url('index.php/ida/changepass')?>" class="cs-navi-tab">权限管理</a></p>
-                        </div>       
+                                <a href="javascript:void(0);" src="<?= base_url('index.php/admin_add_user')?>" class="cs-navi-tab">添加用户</a></p>
+                        </div>
 		</div>
 	</div>
 	<div id="mainPanle" region="center" border="true" border="false">
             <div id="tabs" class="easyui-tabs"  fit="true" border="false" >
                 <div title="Home">
                     <div class="cs-home-remark">
-                        <h1>教学资源云平台控制面板</h1> <br>
+                        <h1>控制面板</h1> <br>
                         <h2>Shenyang University Of Technology </h2><br/>
-                        <a style="color: red">Made In China</a><br/>
-                        Copyright 2015.03-<?=  date("Y") . '.' . date('m')?> SUT NWS/ACM<br/> 
-                        Powered By *Chen XinYi 保留著作权<br/>
-                        Alpha1 build 0001<br/>
                     </div>
                 </div>
             </div>

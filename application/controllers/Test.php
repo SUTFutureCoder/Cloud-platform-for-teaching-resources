@@ -20,20 +20,20 @@ class Test extends CI_Controller{
     
     /**    
      *  @Purpose:    
-     *  调取数据并显示【答题】    
+     *  调取数据并显示    
      *  @Method Name:
-     *  Paper()    
+     *  Index()    
      *  @Parameter: 
      *     
      *  @Return: 
      *  
     */
-    public function Paper(){
+    public function Index(){
         $this->load->library('session');
-        $this->load->library('ida/cache');
-        $this->load->model('ida/act_model');
-        $this->load->model('ida/answer_model');
-        $this->load->model('ida/question_model');
+        $this->load->library('cache');
+        $this->load->model('act_model');
+        $this->load->model('answer_model');
+        $this->load->model('question_model');
         
         if (!$this->session->userdata('user_id')){
             header("Content-type: text/html; charset=utf-8");
@@ -74,7 +74,7 @@ class Test extends CI_Controller{
                 }
                 $history_question_data = $this->setMulti($mc->getMulti($history_question_list, $null, Memcached::GET_PRESERVE_ORDER));
                 
-                $this->load->view('ida/test_view', array('history' => 1,
+                $this->load->view('test_view', array('history' => 1, 
                     'question_data_list' => $history_question_data,
                     'user_act_data' => $history_answer));
                 return 0;
@@ -94,31 +94,93 @@ class Test extends CI_Controller{
                     
                 //显示排行榜
                 $rank = array();
-                $rank = $this->getRank($this->session->userdata('user_id'), $this->input->post('act_id', TRUE));
+                $rank = $this->getRank($this->input->post('act_id', TRUE));
                 
                 //获取统计信息
                 $act_statis = array();
                 $act_statis = $this->act_model->getActStatisById($this->input->post('act_id', TRUE));
                 
-                $this->load->view('ida/test_view', array('answer_fin' => 1, 'history' => $history, 'act_info' => $act_info, 'ranking' => $rank, 'act_statis' => $act_statis));
+                $this->load->view('test_view', array('answer_fin' => 1, 'history' => $history, 'act_info' => $act_info, 'ranking' => $rank, 'act_statis' => $act_statis));
                 return 0;
             }
         }
         
         //检查是否在答题时间范围内
         if ($act_data['act_start'] > date('Y-m-d H:i:s') || $act_data['act_end'] < date('Y-m-d H:i:s')){
-            $this->load->view('ida/test_view', array('out_of_time' => 1));
+            $this->load->view('test_view', array('out_of_time' => 1));
             return 0;
         }
         
-        //获取问题数据列表
-        $question_data_list = $this->generateQuestionList(array(
-            'act_question_choose_sum' => $act_data['act_question_choose_sum'],
-            'act_question_multi_choose_sum' => $act_data['act_question_multi_choose_sum'],
-            'act_question_fill_sum' => $act_data['act_question_fill_sum'],
-            'act_question_judge_sum' => $act_data['act_question_judge_sum'],
-            'act_question_type' => $act_data['act_question_type']
-        ), $mc);
+        //生成题库
+        $question_id_list = array();
+        $question_data_list = array();
+        $null = null;
+        $question_score_list = array();
+        
+        //choose
+        if ($choose_sum = $act_data['act_question_choose_sum']){
+            $question_id_list['choose'] = $this->getQuestionIdListByType($act_data['act_question_type'], 'choose');
+            if (count($question_id_list['choose']) > $choose_sum){
+                $question_id_list['choose'] = array_slice($question_id_list['choose'], 0, $choose_sum);
+            }
+            
+            //遍历以便getMulti
+            if (is_array($question_id_list['choose'])){
+                foreach ($question_id_list['choose'] as $value){
+                    $choose_mc_list[] = 'ida_' . $this->cache->getNS('question') . '_' . $value;
+                }
+                $choose_item = $mc->getMulti($choose_mc_list, $null, Memcached::GET_PRESERVE_ORDER);
+                $question_data_list = array_merge($question_data_list, $this->setMulti($choose_item));
+            }
+        }
+        
+        //multi_choose
+        if ($multi_choose_sum = $act_data['act_question_multi_choose_sum']){
+            $question_id_list['multi_choose'] = $this->getQuestionIdListByType($act_data['act_question_type'], 'multi_choose');            
+            if (count($question_id_list['multi_choose']) > $multi_choose_sum){
+                $question_id_list['multi_choose'] = array_slice($question_id_list['multi_choose'], 0, $multi_choose_sum);
+            }
+            
+            if (is_array($question_id_list['multi_choose'])){
+                foreach ($question_id_list['multi_choose'] as $value){
+                    $multi_choose_mc_list[] = 'ida_' . $this->cache->getNS('question') . '_' . $value;
+                }
+                $multi_choose_item = $mc->getMulti($multi_choose_mc_list, $null, Memcached::GET_PRESERVE_ORDER);
+                $question_data_list = array_merge($question_data_list, $this->setMulti($multi_choose_item));
+            }
+        }
+        
+        //fill
+        if ($fill_sum = $act_data['act_question_fill_sum']){
+            $question_id_list['fill'] = $this->getQuestionIdListByType($act_data['act_question_type'], 'fill');
+            if (count($question_id_list['fill']) > $fill_sum){
+                $question_id_list['fill'] = array_slice($question_id_list['fill'], 0, $fill_sum);
+            }
+            
+            if (is_array($question_id_list['fill'])){
+                foreach ($question_id_list['fill'] as $value){
+                    $fill_mc_list[] = 'ida_' . $this->cache->getNS('question') . '_' . $value;
+                }
+                $fill_item = $mc->getMulti($fill_mc_list, $null, Memcached::GET_PRESERVE_ORDER);
+                $question_data_list = array_merge($question_data_list, $this->setMulti($fill_item));
+            }
+        }
+        
+        //judge
+        if ($judge_sum = $act_data['act_question_judge_sum']){
+            $question_id_list['judge'] = $this->getQuestionIdListByType($act_data['act_question_type'], 'judge');
+            if (count($question_id_list['judge']) > $judge_sum){
+                $question_id_list['judge'] = array_slice($question_id_list['judge'], 0, $judge_sum);
+            }
+            
+            if (is_array($question_id_list['judge'])){
+                foreach ($question_id_list['judge'] as $value){
+                    $judge_mc_list[] = 'ida_' . $this->cache->getNS('question') . '_' . $value;
+                }
+                $judge_item = $mc->getMulti($judge_mc_list, $null, Memcached::GET_PRESERVE_ORDER);
+                $question_data_list = array_merge($question_data_list, $this->setMulti($judge_item));
+            }
+        }
         
 //        var_dump($question_id_list);
         //获取id列表完毕，根据id批量取数据
@@ -128,7 +190,7 @@ class Test extends CI_Controller{
         $db_data = array();
         $db_data['user_id'] = $this->session->userdata('user_id');
         $db_data['user_name'] = $this->session->userdata('user_name');
-        $db_data['user_school'] = $this->session->userdata('user_school');
+        $db_data['user_school'] = implode(',', json_decode($this->session->userdata('user_school'), true));
         $db_data['act_id'] = $this->input->post('act_id', TRUE);
         $db_data['start_time'] = date('Y-m-d H:i:s');
         $db_data['answer_score'] = 0;
@@ -156,151 +218,7 @@ class Test extends CI_Controller{
         }
         $db_data['left_time'] = strtotime($db_data['end_time']) - time();
         //显示答题界面
-        $this->load->view('ida/test_view', array('new_act' => 1,
-            'question_data_list' => $question_data_list,
-            'user_act_data' => $db_data));
-    }
-    
-    
-    /**    
-     *  @Purpose:    
-     *  调取数据并显示【调研】    
-     *  @Method Name:
-     *  Investigation()    
-     *  @Parameter: 
-     *     
-     *  @Return: 
-     *  
-    */
-    public function Investigation(){
-        $this->load->library('session');
-        $this->load->library('ida/cache');
-        $this->load->model('ida/act_model');
-        $this->load->model('ida/answer_model');
-        $this->load->model('ida/question_model');
-        
-        if (!$this->session->userdata('user_id')){
-            header("Content-type: text/html; charset=utf-8");
-            echo '<script>alert("抱歉，请您登录");window.location.href="' . base_url() . '";</script>';
-            return 0;
-        }
-        
-        if (!$this->input->get('act_id', TRUE)){
-            header("Content-type: text/html; charset=utf-8");
-            echo '<script>alert("抱歉，传值错误");window.location.href="' . base_url() . '";</script>';
-            return 0;
-        }
-            
-        //提取信息
-        $mc = $this->cache->memcache();
-        $act_data = array();
-        if (!$act_data = $mc->get('ida_' . $this->cache->getNS('act') . '_act_' . $this->input->get('act_id', TRUE))){
-            if ($act_data = $this->act_model->getActInfoById($this->input->get('act_id', TRUE))){
-                $mc->set('ida_' . $this->cache->getNS('act') . '_act_' . $this->input->get('act_id', TRUE), $act_data);
-            } else {
-                header("Content-type: text/html; charset=utf-8");
-                echo '<script>alert("抱歉，未能在活动库中找到此活动");window.location.href="' . base_url() . '";</script>';
-                return 0;
-            }
-        }
-
-        //检查用户是否已经正在进行完成
-        if ($history = $this->answer_model->checkUserAnswer($this->session->userdata('user_id'), $this->input->get('act_id', TRUE))){
-            $history_question_data = array();
-            if ($history['end_time'] > date('Y-m-d H:i:s')){
-                //正在进行
-                //遍历历史数据并自动填入
-                //!当用户提交回答后end_time为当前时间
-                $history_answer = $this->answer_model->getUserHistoryAnswer($this->session->userdata('user_id'), $this->input->get('act_id', TRUE));
-                $history_answer['left_time'] = strtotime($history_answer['end_time']) - time();
-                foreach ($history_answer['question_id_list'] as $value){
-                    $history_question_list[] = 'ida_' . $this->cache->getNS('question') . '_' . $value;
-                }
-                $history_question_data = $this->setMulti($mc->getMulti($history_question_list, $null, Memcached::GET_PRESERVE_ORDER));
-                
-                $this->load->view('ida/test_view', array('history' => 1,
-                    'question_data_list' => $history_question_data,
-                    'user_act_data' => $history_answer));
-                return 0;
-                
-            } else {
-                if (0 == $history['answer_score'] && isset($history['user_answer_list'])){
-                    //用户可能未完成即关闭页面，重新计算分数
-                    $history['answer_score'] = $this->calcScore($this->session->userdata('user_id'), $this->input->get('act_id', TRUE));
-                } 
-                
-                //获取活动信息
-                $act_info = array();
-                if (!$act_info = $mc->get('ida_' . $this->cache->getNS('act') . '_act_' . $this->input->get('act_id', TRUE))){
-                    $act_info = $this->act_model->getActInfoById($this->input->get('act_id', TRUE));
-                    $mc->set('ida_' . $this->cache->getNS('act') . '_act_' . $this->input->get('act_id', TRUE), $act_info);
-                }
-                    
-                //显示排行榜
-                $rank = array();
-                $rank = $this->getRank($this->session->userdata('user_id'), $this->input->get('act_id', TRUE));
-                
-                //获取统计信息
-                $act_statis = array();
-                $act_statis = $this->act_model->getActStatisById($this->input->get('act_id', TRUE));
-                
-                $this->load->view('ida/test_view', array('answer_fin' => 1, 'history' => $history, 'act_info' => $act_info, 'ranking' => $rank, 'act_statis' => $act_statis));
-                return 0;
-            }
-        }
-        
-        //检查是否在答题时间范围内
-        if ($act_data['act_start'] > date('Y-m-d H:i:s') || $act_data['act_end'] < date('Y-m-d H:i:s')){
-            $this->load->view('ida/test_view', array('out_of_time' => 1));
-            return 0;
-        }
-        
-         //获取问题数据列表
-        $question_data_list = $this->generateQuestionList(array(
-            'act_question_choose_sum' => $act_data['act_question_choose_sum'],
-            'act_question_multi_choose_sum' => $act_data['act_question_multi_choose_sum'],
-            'act_question_fill_sum' => $act_data['act_question_fill_sum'],
-            'act_question_judge_sum' => $act_data['act_question_judge_sum'],
-            'act_question_type' => $act_data['act_question_type']
-        ), $mc);
-        
-//        var_dump($question_id_list);
-        //获取id列表完毕，根据id批量取数据
-//        var_dump($fill_item);
-        
-        //提取写入数据库
-        $db_data = array();
-        $db_data['user_id'] = $this->session->userdata('user_id');
-        $db_data['user_name'] = $this->session->userdata('user_name');
-        $db_data['user_school'] = $this->session->userdata('user_school');
-        $db_data['act_id'] = $this->input->get('act_id', TRUE);
-        $db_data['start_time'] = date('Y-m-d H:i:s');
-        $db_data['answer_score'] = 0;
-        if ($act_data['act_end'] < date('Y-m-d H:i:s', strtotime($db_data['start_time']  . ' +' . $act_data['act_paper_time'] . ' min'))){
-            //极限情况
-            $db_data['end_time'] = $act_data['act_end'];
-        } else {
-            $db_data['end_time'] = date('Y-m-d H:i:s', strtotime($db_data['start_time']  . ' +' . $act_data['act_paper_time'] . ' min'));
-        }
-        $db_data['answer_time'] = strtotime($db_data['end_time']) - strtotime($db_data['start_time']);
-        
-        foreach ($question_data_list as $value){
-            $db_data['question_id_list'][] = $value['question_id'];
-            $db_data['correct_answer_list'][] = $value['question_answer'];
-            $db_data['question_socre_list'][] = $value['question_score'];
-//            $db_data['user_answer_list'][] = 0;
-        }
-        
-        //写入answer中
-        if (!$this->answer_model->setInitAnswer($db_data)){
-            //未写入数据库
-            header("Content-type: text/html; charset=utf-8");
-            echo '<script>alert("抱歉，数据库出现未知问题，请联系开发者QQ：506200331，为您的带来的不便致歉");window.location.href="' . base_url() . '";</script>';
-            return 0;
-        }
-        $db_data['left_time'] = strtotime($db_data['end_time']) - time();
-        //显示答题界面
-        $this->load->view('ida/test_view', array('new_act' => 1,
+        $this->load->view('test_view', array('new_act' => 1,
             'question_data_list' => $question_data_list,
             'user_act_data' => $db_data));
     }
@@ -318,8 +236,8 @@ class Test extends CI_Controller{
      *  array $data 已被打乱顺序的列表数组
     */
     private function getQuestionIdListByType($question_section, $question_type){
-        $this->load->library('ida/cache');
-        $this->load->model('ida/question_model');
+        $this->load->library('cache');
+        $this->load->model('question_model');
         
         $mc = $this->cache->memcache();
         if (!$data = $mc->get('ida_' . $this->cache->getNS('question_type') . '_' . $question_section . '_' . $question_type)){
@@ -353,8 +271,8 @@ class Test extends CI_Controller{
      *  array $data 完全填充问题列表 
     */
     private function setMulti($item){
-        $this->load->model('ida/question_model');
-        $this->load->library('ida/cache');
+        $this->load->model('question_model');
+        $this->load->library('cache');
         
         $mc = $this->cache->memcache();
         
@@ -396,7 +314,7 @@ class Test extends CI_Controller{
     */
     public function saveAnswer(){
         $this->load->library('session');
-        $this->load->model('ida/answer_model');
+        $this->load->model('answer_model');
         
         
         if (!$this->session->userdata('user_id')){
@@ -456,7 +374,7 @@ class Test extends CI_Controller{
     private function calcScore($user_id, $act_id){
         //防止出现意外，以数据库数据为准
         $this->load->library('session');
-        $this->load->model('ida/answer_model');
+        $this->load->model('answer_model');
         
         $data = $this->answer_model->getUserHistoryAnswer($user_id, $act_id);
         
@@ -500,100 +418,13 @@ class Test extends CI_Controller{
      *  @Return: 
      *  score 分数
     */
-    private function getRank($user_id, $act_id){
+    private function getRank($act_id){
         //防止出现意外，以数据库数据为准
         $this->load->library('session');
-        $this->load->model('ida/act_model');
+        $this->load->model('act_model');
         
-        $rank = $this->act_model->getUserRank($user_id, $act_id);
+        $rank = $this->act_model->getUserRank($act_id);
         
         return $rank;
-    }
-    
-    
-    /**    
-     *  @Purpose:    
-     *  获取排行榜    
-     *  @Method Name:
-     *  generateQuestionList($sum_data)
-     *  @Parameter: 
-     *  $sum_data 各问题类型合计列表
-     *  @Return: 
-     *  $question_data_list 题目列表
-    */
-    
-    private function generateQuestionList($sum_data, $mc){
-        //生成题库
-        $question_id_list = array();
-        $question_data_list = array();
-        $null = null;
-        $question_score_list = array();
-        
-        //choose
-        if ($choose_sum = $sum_data['act_question_choose_sum']){
-            $question_id_list['choose'] = $this->getQuestionIdListByType($sum_data['act_question_type'], 'choose');
-            if (count($question_id_list['choose']) > $choose_sum){
-                $question_id_list['choose'] = array_slice($question_id_list['choose'], 0, $choose_sum);
-            }
-            
-            //遍历以便getMulti
-            if (is_array($question_id_list['choose'])){
-                foreach ($question_id_list['choose'] as $value){
-                    $choose_mc_list[] = 'ida_' . $this->cache->getNS('question') . '_' . $value;
-                }
-                $choose_item = $mc->getMulti($choose_mc_list, $null, Memcached::GET_PRESERVE_ORDER);
-                $question_data_list = array_merge($question_data_list, $this->setMulti($choose_item));
-            }
-        }
-        
-        //multi_choose
-        if ($multi_choose_sum = $sum_data['act_question_multi_choose_sum']){
-            $question_id_list['multi_choose'] = $this->getQuestionIdListByType($sum_data['act_question_type'], 'multi_choose');            
-            if (count($question_id_list['multi_choose']) > $multi_choose_sum){
-                $question_id_list['multi_choose'] = array_slice($question_id_list['multi_choose'], 0, $multi_choose_sum);
-            }
-            
-            if (is_array($question_id_list['multi_choose'])){
-                foreach ($question_id_list['multi_choose'] as $value){
-                    $multi_choose_mc_list[] = 'ida_' . $this->cache->getNS('question') . '_' . $value;
-                }
-                $multi_choose_item = $mc->getMulti($multi_choose_mc_list, $null, Memcached::GET_PRESERVE_ORDER);
-                $question_data_list = array_merge($question_data_list, $this->setMulti($multi_choose_item));
-            }
-        }
-        
-        //fill
-        if ($fill_sum = $sum_data['act_question_fill_sum']){
-            $question_id_list['fill'] = $this->getQuestionIdListByType($sum_data['act_question_type'], 'fill');
-            if (count($question_id_list['fill']) > $fill_sum){
-                $question_id_list['fill'] = array_slice($question_id_list['fill'], 0, $fill_sum);
-            }
-            
-            if (is_array($question_id_list['fill'])){
-                foreach ($question_id_list['fill'] as $value){
-                    $fill_mc_list[] = 'ida_' . $this->cache->getNS('question') . '_' . $value;
-                }
-                $fill_item = $mc->getMulti($fill_mc_list, $null, Memcached::GET_PRESERVE_ORDER);
-                $question_data_list = array_merge($question_data_list, $this->setMulti($fill_item));
-            }
-        }
-        
-        //judge
-        if ($judge_sum = $sum_data['act_question_judge_sum']){
-            $question_id_list['judge'] = $this->getQuestionIdListByType($sum_data['act_question_type'], 'judge');
-            if (count($question_id_list['judge']) > $judge_sum){
-                $question_id_list['judge'] = array_slice($question_id_list['judge'], 0, $judge_sum);
-            }
-            
-            if (is_array($question_id_list['judge'])){
-                foreach ($question_id_list['judge'] as $value){
-                    $judge_mc_list[] = 'ida_' . $this->cache->getNS('question') . '_' . $value;
-                }
-                $judge_item = $mc->getMulti($judge_mc_list, $null, Memcached::GET_PRESERVE_ORDER);
-                $question_data_list = array_merge($question_data_list, $this->setMulti($judge_item));
-            }
-        }
-        
-        return $question_data_list;
     }
 }

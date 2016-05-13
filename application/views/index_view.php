@@ -64,10 +64,7 @@
         <br/>
         <br/>
         <br/>
-        <div class="alert alert-success" role="alert">公开课程</div>
-        <br/>
-
-        <div class="alert alert-info" role="alert">正在进行的课后答题</div>
+        <div class="alert alert-info" role="alert">正在进行的答题</div>
         <?php if (is_array($act_list)): ?>
         <div class="row">
             <?php foreach ($act_list as $key => $value): ?>
@@ -237,7 +234,7 @@
                             </tr>
                             <tr>
                                 <td><button type="button" class="btn btn-default btn-block" data-dismiss="modal" >关闭</button></td>
-                                <td><form action="<?= base_url('index.php/test/Paper')?>" method="POST"><input type="text" hidden="hidden" name="act_id" id="test_post_value"><input type="submit" type="button" class="btn btn-success btn-block" value="已知晓并准备就绪"></form></td>
+                                <td><form action="<?= base_url('index.php/test')?>" method="POST"><input type="text" hidden="hidden" name="act_id" id="test_post_value"><input type="submit" type="button" class="btn btn-success btn-block" value="已知晓并准备就绪"></form></td>
                             </tr>
                         </tbody>
                     </table>
@@ -271,17 +268,20 @@
                         alert(data['error']);
                     } else {
                         $("#loginModal").modal('toggle');
-                        $(".navbar-right").empty();  
-                        $(".navbar-right").append('<li class="dropdown active">' + 
-                    '<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">' + data['user_name'] + '<span class="caret"></span></a>' + 
-                    '<ul class="dropdown-menu" role="menu">' + 
-                    '<li class="divider"></li>' +                     
-                    '<li><a id="logout" onclick="logOut()" href="#">注销</a></li>' + 
-                    '</ul>'+
-                '</li>');
-                        $("#login_button").removeAttr("onclick");
-                        $("#form_login").resetForm();
-                        logined = 1;
+                        //登录成功
+                        window.location.reload(true);
+//
+//                        $(".navbar-right").empty();
+//                        $(".navbar-right").append('<li class="dropdown active">' +
+//                    '<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">' + data['user_name'] + '<span class="caret"></span></a>' +
+//                    '<ul class="dropdown-menu" role="menu">' +
+//                    '<li class="divider"></li>' +
+//                    '<li><a id="logout" onclick="logOut()" href="#">注销</a></li>' +
+//                    '</ul>'+
+//                '</li>');
+//                        $("#login_button").removeAttr("onclick");
+//                        $("#form_login").resetForm();
+//                        logined = 1;
                     }
                     $("#submit_login").removeAttr("disabled");
                     $("#submit_login").attr("value", "登录");

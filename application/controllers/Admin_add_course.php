@@ -44,18 +44,20 @@ class Admin_add_course extends CI_Controller{
             echo json_encode(array('code' => -2, 'data' => '抱歉，传入的课程名称为空或超过1024个字符'));
             exit;
         }
-//        $clean[''] = ;
+        $clean['lesson_name']  = $tempCourseName;
 
         $tempCourseIntro = $this->input->post('course_intro', true);
         if (empty($tempCourseIntro) || isset($tempCourseIntro[1024])){
             echo json_encode(array('code' => -3, 'data' => '抱歉，传入的课程介绍为空或超过1024个字符'));
             exit;
         }
+        $clean['lesson_intro'] = $tempCourseIntro;
 
         $tempLevelSum    = $this->input->post('course_level_sum', true);
         if (empty($tempLevelSum)){
             echo json_encode(array('code' => -4, 'data' => '抱歉，课程节数不能为空'));
         }
+        $clean['']
 
 
 

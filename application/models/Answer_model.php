@@ -38,7 +38,7 @@ class Answer_model extends CI_Model{
             self::$_db = $this->database->conn();
         }
         
-        $cursor = self::$_db->ida->answer->find(array('user_id' => $user_id, 'act_id' => $act_id), array('user_id' => 1, 'start_time' => 1, 'end_time' => 1, 'answer_score' => 1));
+        $cursor = self::$_db->cloud_teaching->answer->find(array('user_id' => $user_id, 'act_id' => $act_id), array('user_id' => 1, 'start_time' => 1, 'end_time' => 1, 'answer_score' => 1));
         
         foreach ($cursor as $key => $value){
             $answer_history = $value;
@@ -70,7 +70,7 @@ class Answer_model extends CI_Model{
             self::$_db = $this->database->conn();
         }
         
-        $cursor = self::$_db->ida->answer->find(array('user_id' => $user_id, 'act_id' => $act_id));
+        $cursor = self::$_db->cloud_teaching->answer->find(array('user_id' => $user_id, 'act_id' => $act_id));
         
         foreach ($cursor as $key => $value){
             $data = $value;
@@ -100,7 +100,7 @@ class Answer_model extends CI_Model{
             self::$_db = $this->database->conn();
         }
         
-        self::$_db->ida->answer->insert($answer_init_data);
+        self::$_db->cloud_teaching->answer->insert($answer_init_data);
         
         if (isset($answer_init_data['_id'])){
             return $answer_init_data['_id'];
@@ -127,7 +127,7 @@ class Answer_model extends CI_Model{
             self::$_db = $this->database->conn();
         }
         
-        $result = self::$_db->ida->answer->update(array('user_id' => $user_id, 'act_id' => $act_id), array('$set' => array('user_answer_list' => $answer_data)));
+        $result = self::$_db->cloud_teaching->answer->update(array('user_id' => $user_id, 'act_id' => $act_id), array('$set' => array('user_answer_list' => $answer_data)));
         return $result;
     } 
     
@@ -152,9 +152,9 @@ class Answer_model extends CI_Model{
         
         if ($fin){
             $end_time = date('Y-m-d H:i:s');
-            $result = self::$_db->ida->answer->update(array('user_id' => $user_id, 'act_id' => $act_id), array('$set' => array('answer_score' => $score, 'end_time' => $end_time, 'answer_time' => (strtotime($end_time) - strtotime($start_time)))));
+            $result = self::$_db->cloud_teaching->answer->update(array('user_id' => $user_id, 'act_id' => $act_id), array('$set' => array('answer_score' => $score, 'end_time' => $end_time, 'answer_time' => (strtotime($end_time) - strtotime($start_time)))));
         }else {
-            $result = self::$_db->ida->answer->update(array('user_id' => $user_id, 'act_id' => $act_id), array('$set' => array('answer_score' => $score)));
+            $result = self::$_db->cloud_teaching->answer->update(array('user_id' => $user_id, 'act_id' => $act_id), array('$set' => array('answer_score' => $score)));
         }
         
         return $result;

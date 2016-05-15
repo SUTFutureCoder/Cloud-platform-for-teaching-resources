@@ -37,7 +37,7 @@ class Role{
         if (!($data = $mc->get('ida_' . self::$_ci->cache->getNS('role') . '_role_name_list'))){
             self::$_ci->load->library('database');
             $db = self::$_ci->database->conn();
-            $cursor = $db->ida->role->find(array(), array('role_name' => 1));
+            $cursor = $db->cloud_teaching->role->find(array(), array('role_name' => 1));
             
             foreach ($cursor as $id => $value){
                 $data[] = $value['role_name'];

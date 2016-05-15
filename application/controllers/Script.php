@@ -23,11 +23,11 @@ class Script extends CI_Controller{
 
     public function updateUserSchoolStringToArray(){
         $objDb       = self::getDbInstance();
-        $arrUserList = $objDb->ida->user->find();
+        $arrUserList = $objDb->cloud_teaching->user->find();
         foreach ($arrUserList as $_id => $value){
             if (is_array($value['user_school'][0])){
                 $strUserSchool = $value['user_school'][0][0];
-                $objDb->ida->user->update(array('_id' => new MongoId($_id)), array('$set' => array('user_school' => array($strUserSchool,))), array('upsert' => false, 'multiple' => true));
+                $objDb->cloud_teaching->user->update(array('_id' => new MongoId($_id)), array('$set' => array('user_school' => array($strUserSchool,))), array('upsert' => false, 'multiple' => true));
             }
 
         }
@@ -36,7 +36,7 @@ class Script extends CI_Controller{
 
     public function addQuestionIsDelete(){
         $objDb = self::getDbInstance();
-        $objDb->ida->question->update(array(), array('$set' => array('is_delete' => 0)), array('upsert' => false, 'multiple' => true));
+        $objDb->cloud_teaching->question->update(array(), array('$set' => array('is_delete' => 0)), array('upsert' => false, 'multiple' => true));
         echo 'done';
     }
 }

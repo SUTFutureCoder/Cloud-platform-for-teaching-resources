@@ -40,7 +40,7 @@ class Authorizee{
         if (!($data = $mc->get('ida_' . self::$_ci->cache->getNS('authorizee') . '_role_name_' . $user_role))){
             self::$_ci->load->library('database');
             $db = self::$_ci->database->conn();
-            $cursor = $db->ida->role->find(array('role_name' => $user_role), array('role_right' => 1));
+            $cursor = $db->cloud_teaching->role->find(array('role_name' => $user_role), array('role_right' => 1));
             
             foreach ($cursor as $id => $value){
                 $data = $value;

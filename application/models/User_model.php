@@ -37,7 +37,7 @@ class User_model extends CI_Model{
         }
         
         try{
-            self::$_db->ida->user->insert($user_info);
+            self::$_db->cloud_teaching->user->insert($user_info);
             $result[0] = 1;
             $result[1] = $user_info['_id'];
         } catch (Exception $ex) {
@@ -62,7 +62,7 @@ class User_model extends CI_Model{
         $arrUserSchool = $arrUserInfo['user_school'];
         unset($arrUserInfo['user_school']);
 
-        return self::$_db->ida->user->update(array('user_telephone' => $intUserMobile,), array('$set' => $arrUserInfo, '$addToSet' => array('user_school' => $arrUserSchool)));
+        return self::$_db->cloud_teaching->user->update(array('user_telephone' => $intUserMobile,), array('$set' => $arrUserInfo, '$addToSet' => array('user_school' => $arrUserSchool)));
     }
     
     /**    
@@ -85,7 +85,7 @@ class User_model extends CI_Model{
             self::$_db = $this->database->conn();
         }
         
-        $cursor = self::$_db->ida->user->find(array('user_telephone' => $user_telephone));
+        $cursor = self::$_db->cloud_teaching->user->find(array('user_telephone' => $user_telephone));
         foreach ($cursor as $key => $value){
             //只匹配一个
             $data = $value;
@@ -125,7 +125,7 @@ class User_model extends CI_Model{
             self::$_db = $this->database->conn();
         }
         
-        $cursor = self::$_db->ida->user->find(array('user_telephone' => $user_telephone));
+        $cursor = self::$_db->cloud_teaching->user->find(array('user_telephone' => $user_telephone));
         foreach ($cursor as $key => $value){
             
         }
@@ -149,7 +149,7 @@ class User_model extends CI_Model{
             self::$_db = $this->database->conn();
         }
 
-        $cursor = self::$_db->ida->user->find(array('_id' => array('$in' => $arrUserIds)),
+        $cursor = self::$_db->cloud_teaching->user->find(array('_id' => array('$in' => $arrUserIds)),
             array('user_name' => 1, 'user_telephone' => 1, 'user_mail' => 1, 'user_number' => 1, 'user_school' => 1, 'user_major' => 1, ));
         $arrUserInfoList = array();
         foreach ($cursor as $value){

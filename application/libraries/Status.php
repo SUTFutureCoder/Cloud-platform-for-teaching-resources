@@ -42,7 +42,7 @@ class Status{
         $db = self::$_ci->database->conn();
         
         //正在进行的活动查询
-        $cursor = self::$_ci->ida->act->count();
+        $cursor = self::$_ci->cloud_teaching->act->count();
         
         
         

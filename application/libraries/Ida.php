@@ -69,18 +69,18 @@ class Ida{
         $act_info = array();
                 
         //正在进行的活动查询
-        $act_info['progress_sum'] = self::$_db->ida->act->find(array('act_start' => array('$lte' => date('Y-m-d H:i:s')), 'act_end' => array('$gte' => date('Y-m-d H:i:s'))))->count();
-        $act_info['overdue_sum'] = self::$_db->ida->act->find(array('act_end' => array('$lt' => date('Y-m-d H:i:s'))))->count();
-        $act_info['future_sum'] = self::$_db->ida->act->find(array('act_start' => array('$gt' => date('Y-m-d H:i:s'))))->count();
+        $act_info['progress_sum'] = self::$_db->cloud_teaching->act->find(array('act_start' => array('$lte' => date('Y-m-d H:i:s')), 'act_end' => array('$gte' => date('Y-m-d H:i:s'))))->count();
+        $act_info['overdue_sum'] = self::$_db->cloud_teaching->act->find(array('act_end' => array('$lt' => date('Y-m-d H:i:s'))))->count();
+        $act_info['future_sum'] = self::$_db->cloud_teaching->act->find(array('act_start' => array('$gt' => date('Y-m-d H:i:s'))))->count();
         $act_info['sum'] = array_sum($act_info);
         $act_info['memcache_act_sum'] = count(self::$_mc->get('ida_' . self::$_ci->cache->getNS('act') . '_ing_list'));
         
-        $cursor = self::$_db->ida->act->find(array(), array('act_name' => 1, '_id' => 1));
+        $cursor = self::$_db->cloud_teaching->act->find(array(), array('act_name' => 1, '_id' => 1));
         
         $act_info['join_sum'] = 0;
         foreach ($cursor as $value){
             $act_info['list'][(string)$value['_id']]['name'] = $value['act_name'];            
-            $act_info['list'][(string)$value['_id']]['join'] = self::$_db->ida->answer->find(array('act_id' => (string)$value['_id']))->count();
+            $act_info['list'][(string)$value['_id']]['join'] = self::$_db->cloud_teaching->answer->find(array('act_id' => (string)$value['_id']))->count();
             $act_info['join_sum'] += $act_info['list'][(string)$value['_id']]['join'];
             
             //获取最大、最小值及平均值
@@ -96,7 +96,7 @@ class Ida{
                 'average_time' => array('$avg' => '$answer_time')
             ));
             
-            $act_info['list'][(string)$value['_id']]['score'] = self::$_db->ida->answer->aggregate(array($match, $group));
+            $act_info['list'][(string)$value['_id']]['score'] = self::$_db->cloud_teaching->answer->aggregate(array($match, $group));
         }
         
         return $act_info;
@@ -136,11 +136,11 @@ class Ida{
         
         $question_info = array();
         
-        $class = self::$_db->ida->command(array('distinct' => 'question', 'key' => 'question_type'));
+        $class = self::$_db->cloud_teaching->command(array('distinct' => 'question', 'key' => 'question_type'));
         
         $question_info['type_sum'] = array();
         foreach ($class['values'] as $value){
-            $question_info['type_sum'][$value] = self::$_db->ida->question->find(array('question_type' => $value))->count();            
+            $question_info['type_sum'][$value] = self::$_db->cloud_teaching->question->find(array('question_type' => $value))->count();
             
         }
         
@@ -176,11 +176,11 @@ class Ida{
         
         $school_info = array();
         
-        $school = self::$_db->ida->command(array('distinct' => 'user', 'key' => 'user_school'));
+        $school = self::$_db->cloud_teaching->command(array('distinct' => 'user', 'key' => 'user_school'));
         
         $school_info['type_sum'] = array();
         foreach ($school['values'] as $value){
-            $school_info['type_sum'][$value[0][0]] = self::$_db->ida->user->find(array('user_school' => $value))->count();
+            $school_info['type_sum'][$value[0][0]] = self::$_db->cloud_teaching->user->find(array('user_school' => $value))->count();
         }
         
         arsort($school_info['type_sum']);

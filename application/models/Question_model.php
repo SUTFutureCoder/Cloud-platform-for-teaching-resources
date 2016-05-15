@@ -43,8 +43,8 @@ class Question_model extends CI_Model{
         self::getDbInstance();
         
         $type = array();
-//        $type_cursor = self::$_db->ida->command(array('distinct' => 'question', 'key' => 'question_type', 'query' => array('is_delete' => 0)));
-        $type_cursor = self::$_db->ida->question->distinct('question_type', array('is_delete' => 0));
+//        $type_cursor = self::$_db->cloud_teaching->command(array('distinct' => 'question', 'key' => 'question_type', 'query' => array('is_delete' => 0)));
+        $type_cursor = self::$_db->cloud_teaching->question->distinct('question_type', array('is_delete' => 0));
 
         foreach ($type_cursor as $key => $value){
             $type[] = $value;
@@ -68,7 +68,7 @@ class Question_model extends CI_Model{
         
         //设置或获取自增
         //[这种设计比较有问题，如果被问题被删除如何处理是个问题，因此以后最好只用_id。本着不要动运行良好代码的原则，所以将全部问题加上is_delete]
-        $cursor = self::$_db->ida->question->find(array(), array('question_id' => 1))->sort(array('question_id' => -1))->limit(1);
+        $cursor = self::$_db->cloud_teaching->question->find(array(), array('question_id' => 1))->sort(array('question_id' => -1))->limit(1);
         foreach ($cursor as $key => $value){
         }
         
@@ -78,7 +78,7 @@ class Question_model extends CI_Model{
             $question['question_id'] = ++$value['question_id'];
         }
         
-        self::$_db->ida->question->insert($question);
+        self::$_db->cloud_teaching->question->insert($question);
         if ($question['_id']){
             return $question['question_id'];
         } else {
@@ -96,7 +96,7 @@ class Question_model extends CI_Model{
      */
     public function updateQuestion($questionId, $arrData){
         self::getDbInstance();
-        if (!empty(self::$_db->ida->question->update(array('question_id' => (int)$questionId), array('$set' => $arrData))['ok'])){
+        if (!empty(self::$_db->cloud_teaching->question->update(array('question_id' => (int)$questionId), array('$set' => $arrData))['ok'])){
             return true;
         } else {
             return false;
@@ -120,7 +120,7 @@ class Question_model extends CI_Model{
         
         $data = array();
         
-        $cursor = self::$_db->ida->question->find(array('type' => $type, 'question_type' => $question_type, 'is_delete' => 0), array('question_id' => 1));
+        $cursor = self::$_db->cloud_teaching->question->find(array('type' => $type, 'question_type' => $question_type, 'is_delete' => 0), array('question_id' => 1));
         
         foreach ($cursor as $key => $value){
             $data[] = $value['question_id'];
@@ -146,7 +146,7 @@ class Question_model extends CI_Model{
     public function getQuestionById($question_id){
         self::getDbInstance();
         
-        $cursor = self::$_db->ida->question->find(array('question_id' => (int)$question_id));
+        $cursor = self::$_db->cloud_teaching->question->find(array('question_id' => (int)$question_id));
         
         foreach ($cursor as $key => $value){
             $data = $value;
@@ -176,9 +176,9 @@ class Question_model extends CI_Model{
             $arrConds = array('question_type' => $strQuestionBank, 'type' => $strQuestionType);
         }
 
-        $cursor  = self::$_db->ida->question->find($arrConds)->sort(array('question_add_time' => -1))->limit($intPerpage)->skip(($intPageNo - 1) * $intPerpage);
+        $cursor  = self::$_db->cloud_teaching->question->find($arrConds)->sort(array('question_add_time' => -1))->limit($intPerpage)->skip(($intPageNo - 1) * $intPerpage);
         $data    = array(
-            'sum' => $datasum = self::$_db->ida->question->find($arrConds)->count()
+            'sum' => $datasum = self::$_db->cloud_teaching->question->find($arrConds)->count()
         );
         foreach ($cursor as $key => $value){
             $data['data'][] = $value;
@@ -196,7 +196,7 @@ class Question_model extends CI_Model{
     public function searchQuestion($keyword, $arrField = array()){
         self::getDbInstance();
 
-        $cursor = self::$_db->ida->question->find(array('question_content' => new MongoRegex("/$keyword/"), 'is_delete' => 0), $arrField)->sort(array('question_add_time' => -1));
+        $cursor = self::$_db->cloud_teaching->question->find(array('question_content' => new MongoRegex("/$keyword/"), 'is_delete' => 0), $arrField)->sort(array('question_add_time' => -1));
 
         $data   = array();
         foreach ($cursor as $key => $value){
@@ -215,7 +215,7 @@ class Question_model extends CI_Model{
     public function deleteQuestionById($intQuestionId){
         self::getDbInstance();
 
-        if (!empty(self::$_db->ida->question->update(array('question_id' => (int)$intQuestionId), array('$set' => array('is_delete' => 1)))['ok'])){
+        if (!empty(self::$_db->cloud_teaching->question->update(array('question_id' => (int)$intQuestionId), array('$set' => array('is_delete' => 1)))['ok'])){
             return true;
         } else {
             return false;

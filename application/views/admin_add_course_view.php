@@ -8,7 +8,7 @@
 </head>
 <body>
 <br/>
-<form action="admin_add_course/setCourse" class="form-horizontal" role="form" id="form_add_course" method="post">
+<form action="admin_add_course/setCourse" class="form-horizontal" role="form" id="form_add_course" method="post" enctype="multipart/form-data">
     <div class="form-group">
         <label for="course_name" class="col-sm-2 control-label">课程名称</label>
         <div class="col-sm-9">
@@ -125,7 +125,7 @@
 
                     //多资料上传
                     domToAppend    += '<div class="form-group"><label for="course_res_attach_upload_' + i + '" class="col-sm-2 control-label">子课多课件上传</label>';
-                    domToAppend    += '<div class="col-sm-9"><input class="form-control" multiple="multiple"  type="file" name="course_res_attach_upload[' + i + ']" id="course_res_attach_upload_' + i + '"></div></div>';
+                    domToAppend    += '<div class="col-sm-9"><input class="form-control" multiple="multiple"  type="file" name="course_res_attach_upload[' + i + '][]" id="course_res_attach_upload_' + i + '"></div></div>';
 
                     domToAppend    += '<hr>';
                     courseLevelSetArea.append(domToAppend);

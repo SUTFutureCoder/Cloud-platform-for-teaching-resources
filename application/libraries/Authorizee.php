@@ -28,6 +28,10 @@ class Authorizee{
      *  0 失败
     */ 
     public function CheckAuthorizee($user_role, $role_authorizee){
+        if (empty($user_role)){
+            return 0;
+        }
+
         if (!self::$_ci){
             //在自定义类库中初始化CI资源
             self::$_ci =& get_instance();       

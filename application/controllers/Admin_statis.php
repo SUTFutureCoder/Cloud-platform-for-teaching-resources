@@ -39,7 +39,7 @@ class Admin_statis extends CI_Controller{
             return 0;
         }
         
-        $statis = $this->cloud_teaching->getPlatfromStatis();
+        $statis = $this->ida->getPlatfromStatis();
         
         $this->load->view('admin_statis_view', array('statis' => $statis));
     }

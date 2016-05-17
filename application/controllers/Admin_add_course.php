@@ -112,9 +112,11 @@ class Admin_add_course extends CI_Controller{
         }
         //写入数据库
         $this->load->model('Course_model');
-        $ret = $this->Course_model->addCourse($arrLessonListToInsert);
-
-        print_r($_POST);
+        if ($this->Course_model->addCourse($arrLessonListToInsert)){
+            echo json_encode(array('code' => 1));
+        } else {
+            echo json_encode(array('code' => -7, 'error' => '添加到数据库错误'));
+        }
     }
 
     /**

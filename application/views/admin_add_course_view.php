@@ -96,7 +96,7 @@
                         } else {
                             alert('添加成功');
                             dom.formAddCourse.resetForm();
-                            dom.formAddCourse.find('#myEditor').html('');
+                            dom.formAddCourse.find('#myEditor .edui-body-container').html('');
                         }
                         submitBtn.removeAttr("disabled");
                         submitBtn.attr("value", "添加");

@@ -23,6 +23,12 @@
         </div>
     </div>
 
+    <div class="form-group">
+        <label for="course_image_upload" class="col-sm-2 control-label">课程预览图上传</label>
+        <div class="col-sm-9">
+            <input class="form-control"  type="file" name="course_image_upload" id="course_image_upload">
+        </div>
+    </div>
     <hr>
 
 

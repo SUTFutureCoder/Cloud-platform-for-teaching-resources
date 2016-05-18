@@ -31,6 +31,7 @@ class Index extends CI_Controller{
     {          
         $this->load->library('session');
         $this->load->library('cache');
+        $this->load->model('course_model');
         $this->load->model('act_model');
 
         //获取用户学校信息
@@ -39,6 +40,15 @@ class Index extends CI_Controller{
             $strUserSchool = $this->session->userdata('user_school');
             $arrUserSchool = json_decode($strUserSchool, true);
         }
+
+        if ('普通用户' == $this->session->userdata('user_role')){
+            $normalUser = 1;
+        } else {
+            $normalUser = 0;
+        }
+
+        $arrCourseList  = $this->course_model->getCourseList($normalUser, $arrUserSchool);
+
         $data = $this->act_model->getActList($arrUserSchool);
 
 

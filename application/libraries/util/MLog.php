@@ -122,6 +122,8 @@ class MLog{
             );
         }
 
+        $pathInfo = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : 'index';
+
         $strLog = sprintf("%s: %s [%s:%s] args[%s] logId[%s] uri[%s] userId[%s] %s" . PHP_EOL ,
             $strLogType,
             date('y-m-d H:i:s'),
@@ -129,7 +131,7 @@ class MLog{
             $logBackTrace['line'],
             $logBackTrace['args'],
             self::$intLogUuid,
-            $_SERVER['PATH_INFO'],
+            $pathInfo,
             CoreConst::$userId,
             $strLogMsg);
 

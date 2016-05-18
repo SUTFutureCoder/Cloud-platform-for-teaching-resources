@@ -18,6 +18,12 @@ class Admin_add_course extends CI_Controller{
         parent::__construct();
     }
 
+    private function getBosConfig(){
+        $this->load->library('util/BosClient');
+        $arrBosConfig = $this->config->item('bos_bucket_list');
+        return $arrBosConfig[self::BOS_BUCKET];
+    }
+
     public function index(){
         $this->load->library('session');
         $this->load->library('authorizee');
@@ -85,6 +91,13 @@ class Admin_add_course extends CI_Controller{
             }
         }
 
+        //上传预览图
+        $arrBosConfig = $this->getBosConfig();
+        $arrBosRet    = BosClient::putObjectFromFile(self::BOS_BUCKET, $arrBosConfig['secret_key'], $_FILES['course_image_upload']['tmp_name'], $_FILES['course_image_upload']['name']);
+        if (0 != $arrBosRet['code']){
+            //出错
+            throw new MException(CoreConst::MODULE_BOS, ErrorCodes::ERROR_BOS_UPLOAD_ERROR);
+        }
         //合并两个列表并上传资源
         $arrCourseResUrl = $this->uploadRes($_FILES['course_res_upload'], $_FILES['course_res_attach_upload']);
 
@@ -93,6 +106,8 @@ class Admin_add_course extends CI_Controller{
             'lesson_name'  => $tempCourseName,
             'lesson_id'    => Uuid::genUUID(CoreConst::COURSE_UUID),
             'lesson_intro' => $tempCourseIntro,
+            'lesson_level' => 0,
+            'lesson_image' => $arrBosRet['data']['url'],
             'lesson_group_id'  => $clean['lesson_group_id'],
             'lesson_is_private' => $clean['lesson_is_private'],
             'user_id'      => $this->session->userdata('user_id'),
@@ -104,6 +119,7 @@ class Admin_add_course extends CI_Controller{
                 'lesson_name' => $tempLevelValue['name'],
                 'lesson_id'   => Uuid::genUUID(CoreConst::COURSE_UUID),
                 'lesson_group_id'   => $clean['lesson_group_id'],
+                'lesson_level'      => $key,    
                 'lesson_res'        => json_encode($arrCourseResUrl[$key]['main']),
             );
             if (isset($arrCourseResUrl[$key]['attach'])){
@@ -129,9 +145,7 @@ class Admin_add_course extends CI_Controller{
      * @throws MException
      */
     private function uploadRes($mainRes, $attachRes){
-        $this->load->library('util/BosClient');
-        $arrBosConfig = $this->config->item('bos_bucket_list');
-        $arrBosConfig = $arrBosConfig[self::BOS_BUCKET];
+        $arrBosConfig = $this->getBosConfig();
 
         //开始上传并记录结果
         foreach ($mainRes['name'] as $key => $mainResValue){
@@ -145,6 +159,7 @@ class Admin_add_course extends CI_Controller{
             //处理主资源
             $arrResRet[$key]['main'] = array(
                 'url'  => $arrBosRet['data']['url'],
+                'type' => explode('/', $mainRes['type'][$key])[0],
                 'name' => $mainRes['name'][$key],
             );
 
@@ -160,6 +175,7 @@ class Admin_add_course extends CI_Controller{
                     //处理附加情况
                     $arrResRet[$key]['attach'][] = array(
                         'url'  => $arrBosRet['data']['url'],
+                        'type' => explode('/', $attachRes['type'][$key][$attachKey])[0],
                         'name' => $attachRes['name'][$key][$attachKey],
                     );
                 }

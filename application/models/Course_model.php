@@ -94,6 +94,11 @@ class Course_model extends CI_Model{
             return false;
         }
 
+        //没有这个level
+        if (count($courseInfo) < ($intLevelId + 1)){
+            return false;
+        }
+
         //2.获取课程私有情况
         if (0 == $courseInfo[0]['lesson_level'] && 1 == $courseInfo[0]['lesson_is_private'] && $normalUser){
             $this->db->where('school_name IN ("' . implode('","', $userSchool) . '")');

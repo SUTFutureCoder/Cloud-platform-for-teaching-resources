@@ -63,7 +63,8 @@ class Index extends CI_Controller{
 //        }
         
         $this->load->view('index_view', array(
-            'act_list' => $data   
+            'act_list'    => $data,
+            'course_list' => $arrCourseList,
         ));
     }
     

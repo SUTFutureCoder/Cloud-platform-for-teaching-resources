@@ -64,6 +64,28 @@
         <br/>
         <br/>
         <br/>
+        <div class="alert alert-info" role="alert">课程列表</div>
+        <?php if (is_array($course_list)): ?>
+            <div class="row">
+                <?php foreach ($course_list as $key => $value): ?>
+                    <div class="col-sm-6 col-md-4">
+                        <div class="thumbnail">
+                            <?php if (empty($value['lesson_image'])):?>
+                                <img src="img/default.jpg" alt="...">
+                            <?php else: ?>
+                                <img src="<?= $value['lesson_image'] ?>" alt="...">
+                            <?php endif; ?>
+                            <div class="caption">
+                                <h3><?= $value['lesson_name']?></h3>
+                                <p><?=  $value['user_name'] ?>老师</p>
+                                <p><a class="btn btn-primary" role="button" href='<?= base_url('index.php/Course_join/index/' . $value['lesson_group_id'] . '/1') ?>' target="_blank" ">参加课程</a></p>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
         <div class="alert alert-info" role="alert">正在进行的答题</div>
         <?php if (is_array($act_list)): ?>
         <div class="row">

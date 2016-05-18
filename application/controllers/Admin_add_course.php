@@ -83,6 +83,7 @@ class Admin_add_course extends CI_Controller{
             $clean['lesson_is_private'] = 0;
         }
 
+
         //确定必须的文件是否上传
         for ($i = 1; $i <= $tempLevelSum; ++$i){
             if (empty($_FILES['course_res_upload']['name'][$i]) || 0 != $_FILES['course_res_upload']['error'][$i]){
@@ -160,6 +161,7 @@ class Admin_add_course extends CI_Controller{
             $arrResRet[$key]['main'] = array(
                 'url'  => $arrBosRet['data']['url'],
                 'type' => explode('/', $mainRes['type'][$key])[0],
+                'ext'  => explode('/', $mainRes['type'][$key])[1],
                 'name' => $mainRes['name'][$key],
             );
 
@@ -176,6 +178,7 @@ class Admin_add_course extends CI_Controller{
                     $arrResRet[$key]['attach'][] = array(
                         'url'  => $arrBosRet['data']['url'],
                         'type' => explode('/', $attachRes['type'][$key][$attachKey])[0],
+                        'ext'  => explode('/', $attachRes['type'][$key][$attachKey])[1],
                         'name' => $attachRes['name'][$key][$attachKey],
                     );
                 }

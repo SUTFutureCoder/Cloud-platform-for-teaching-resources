@@ -15,7 +15,7 @@ class Course_join extends CI_Controller{
         parent::__construct();
     }
 
-    public function index(){
+    public function index($intGroup, $intLevel){
         $this->load->library('session');
         if (!$this->session->userdata('user_id')){
             header("Content-type: text/html; charset=utf-8");
@@ -33,12 +33,7 @@ class Course_join extends CI_Controller{
             $arrUserSchool = json_decode($this->session->userdata('user_school'), true);
         }
 
-//        $intGroup = $this->input->post('lesson_group_id', true);
-        $intGroup = 1463563661134;
-//        $intGroup = 1463546246124444;
-//        $intLevel = $this->input->post('lesson_level',    true);
-        $intLevel = 0;
-        if (is_int($intLevel) || $intLevel <= 0){
+        if ($intLevel <= 0){
             $intLevel = 1;
         }
 
@@ -55,7 +50,6 @@ class Course_join extends CI_Controller{
         } else {
             $arrCourseAttach = json_decode($arrCouseInfo[$intLevel]['lesson_res_attach'], true);
         }
-
 
         $this->load->view('course_join_view',
             array(

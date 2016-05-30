@@ -27,7 +27,7 @@
 
                         <div title="课程相关">
                             <a href="javascript:void(0);" src="<?= base_url('index.php/admin_add_course') ?>" class="cs-navi-tab">添加课程</a></p>
-
+                            <a href="javascript:void(0);" src="<?= base_url('index.php/admin_course_manage') ?>" class="cs-navi-tab">课程管理</a></p>
                         </div>
 
                         <div title="答题相关">

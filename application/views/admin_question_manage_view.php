@@ -33,21 +33,6 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-
-            <div class="form-group">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        题库操作 <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">复制题库</a></li>
-                        <li><a href="#">重命名题库</a></li>
-                        <li role="separator" class="divider"></li>
-                        <li><a href="#">清空题库</a></li>
-                        <li><a href="#">删除题库</a></li>
-                    </ul>
-                </div>
-            </div>
         </form>
     </div>
     <br/>

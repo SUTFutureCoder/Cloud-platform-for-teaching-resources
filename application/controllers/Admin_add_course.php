@@ -120,7 +120,8 @@ class Admin_add_course extends CI_Controller{
                 'lesson_name' => $tempLevelValue['name'],
                 'lesson_id'   => Uuid::genUUID(CoreConst::COURSE_UUID),
                 'lesson_group_id'   => $clean['lesson_group_id'],
-                'lesson_level'      => $key,    
+                'lesson_level'      => $key,
+                'lesson_is_private' => $clean['lesson_is_private'],
                 'lesson_res'        => json_encode($arrCourseResUrl[$key]['main']),
             );
             if (isset($arrCourseResUrl[$key]['attach'])){

@@ -35,14 +35,14 @@ class Index extends CI_Controller{
         $this->load->model('act_model');
 
         //获取用户学校信息
-        $arrUserSchool     = null;
+        $arrUserSchool     = array();
 
         if ($this->session->userdata('user_telephone')){
             $strUserSchool = $this->session->userdata('user_school');
             $arrUserSchool = json_decode($strUserSchool, true);
         }
 
-        if ('普通用户' == $this->session->userdata('user_role')){
+        if ('普通用户' == $this->session->userdata('user_role') || !$this->session->userdata('user_telephone')){
             $normalUser = 1;
         } else {
             $normalUser = 0;

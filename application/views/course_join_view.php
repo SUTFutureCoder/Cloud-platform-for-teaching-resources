@@ -35,7 +35,7 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li><a href="#">主页</a></li>
+                <li><a href="<?= base_url() ?>">主页</a></li>
                 <li><a href="<?= base_url('index.php/about')?>">About</a></li>
                 <li class="active"><a href="<?= base_url('index.php/course_join')?>">课程</a></li>
             </ul>

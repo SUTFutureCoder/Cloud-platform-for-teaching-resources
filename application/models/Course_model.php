@@ -56,19 +56,21 @@ class Course_model extends CI_Model{
      *
      * @param $normalUser
      * @param $userSchool
+     * @param $page
+     * @param $limit
      */
-    public function getCourseList($normalUser, $userSchool = array()){
+    public function getCourseList($normalUser, $userSchool = array(), $page = 0, $limit = 20){
         $this->load->database();
 
-        $this->db->select('l.lesson_group_id, l.lesson_image, l.lesson_name, l.user_name');
+        $this->db->select('l.lesson_group_id, l.lesson_image, l.lesson_name, l.user_name, l.lesson_is_private, l.lesson_is_deleted, l.lesson_ctime');
         $this->db->from('lesson as l');
-        $this->db->join('lesson_school s', 'l.lesson_group_id=s.lesson_group_id', 'left');
-
-        $this->db->where('l.lesson_level',      0);
-        $this->db->where('l.lesson_is_deleted', 0);
+        $this->db->where('l.lesson_level', 0);
+        $this->db->limit($limit, $page * $limit);
 
         if ($normalUser){
-            $strWhere = ' (l.lesson_is_private = 0 OR (l.lesson_is_private = 1 AND s.school_name IN ("' . implode('","', $userSchool) . '")))';
+            $this->db->join('lesson_school s', 'l.lesson_group_id=s.lesson_group_id', 'left');
+            $this->db->where('l.lesson_is_deleted', 0);
+            $strWhere = '(l.lesson_is_private = 0 OR (l.lesson_is_private = 1 AND s.school_name IN ("' . implode('","', $userSchool) . '")))';
             $this->db->where($strWhere);
         }
 
@@ -83,6 +85,7 @@ class Course_model extends CI_Model{
      * @param $intLevelId
      * @param $normalUser
      * @param array $userSchool
+     * @return bool
      */
     public function getCourseInfo($intGroupId, $intLevelId, $normalUser, $userSchool = array()){
         $this->load->database();
@@ -112,6 +115,34 @@ class Course_model extends CI_Model{
         }
 
         return $courseInfo;
+    }
+
+
+    /**
+     * 模糊搜索课程
+     *
+     * @param $searchCourse
+     * @param $arrSchoolName
+     * @param bool $all 用于管理员后台无视学校名称，显示全部
+     * @param $page
+     * @param $limit
+     * @return mixed
+     */
+    public function searchCourse($searchCourse, $arrSchoolName, $all = false, $page = 0, $limit = 20){
+        $this->load->database();
+
+        $this->db->select('l.lesson_id, l.lesson_group_id, l.lesson_level, l.lesson_name, l.lesson_intro');
+        $this->db->from('lesson as l');
+        if (false === $all){
+            $this->db->where('l.lesson_is_deleted', 0);
+            $this->db->where('(l.lesson_is_private = 0 OR (l.lesson_is_private = 1 AND lesson_school.school_name IN ("' . implode('","', $arrSchoolName) . '")))');
+            $this->db->join('lesson_school', 'lesson_school.lesson_group_id=l.lesson_group_id', 'left');
+        }
+        $this->db->like('l.lesson_name', $searchCourse, 'both');
+        $this->db->limit($limit, $page * $limit);
+
+        $arrCourseRet = $this->db->get()->result_array();
+        return $arrCourseRet;
     }
 
 }

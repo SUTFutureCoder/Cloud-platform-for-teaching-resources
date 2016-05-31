@@ -238,7 +238,7 @@ class Test extends CI_Controller{
     private function getQuestionIdListByType($question_section, $question_type){
         $this->load->library('cache');
         $this->load->model('question_model');
-        
+
         $mc = $this->cache->memcache();
         if (!$data = $mc->get('ida_' . $this->cache->getNS('question_type') . '_' . $question_section . '_' . $question_type)){
             //从数据库中dump到分类

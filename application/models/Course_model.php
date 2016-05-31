@@ -60,16 +60,20 @@ class Course_model extends CI_Model{
     public function getCourseList($normalUser, $userSchool = array()){
         $this->load->database();
 
-        $this->db->where('lesson_level',      0);
-        $this->db->where('lesson_is_deleted', 0);
+        $this->db->select('l.lesson_group_id, l.lesson_image, l.lesson_name, l.user_name');
+        $this->db->from('lesson as l');
+        $this->db->join('lesson_school s', 'l.lesson_group_id=s.lesson_group_id', 'left');
+
+        $this->db->where('l.lesson_level',      0);
+        $this->db->where('l.lesson_is_deleted', 0);
 
         if ($normalUser){
-            $strWhere = ' (lesson_is_private = 0 OR (lesson_is_private = 1 AND lesson_school.school_name IN ("' . implode('","', $userSchool) . '")))';
+            $strWhere = ' (l.lesson_is_private = 0 OR (l.lesson_is_private = 1 AND s.school_name IN ("' . implode('","', $userSchool) . '")))';
             $this->db->where($strWhere);
         }
 
-        $this->db->order_by('lesson_ctime', 'desc');
-        return $this->db->get(self::TABLE_NAME)->result_array();
+        $this->db->order_by('l.lesson_ctime', 'desc');
+        return $this->db->get()->result_array();
     }
 
     /**

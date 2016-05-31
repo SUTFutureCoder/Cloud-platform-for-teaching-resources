@@ -36,6 +36,7 @@ class Index extends CI_Controller{
 
         //获取用户学校信息
         $arrUserSchool     = null;
+
         if ($this->session->userdata('user_telephone')){
             $strUserSchool = $this->session->userdata('user_school');
             $arrUserSchool = json_decode($strUserSchool, true);
@@ -129,13 +130,9 @@ class Index extends CI_Controller{
             echo json_encode(array('code' => -4, 'error' => '抱歉，查无此人或密码错误'));
             return 0;
         }
-        
-        //写入session
-        $this->session->set_userdata('user_name', $result['user_name']);
-        $this->session->set_userdata('user_role', $result['user_role']);
-        $this->session->set_userdata('user_id', $result['_id']);
-        $this->session->set_userdata('user_telephone', $result['user_telephone']);
-        $this->session->set_userdata('user_school', json_encode($result['user_school']));
+
+        //写入到session中
+        $this->setUserInfoToSession($result);
 
         echo json_encode(array('code' => 1, 'user_name' => $result['user_name']));
     }
@@ -233,12 +230,9 @@ class Index extends CI_Controller{
             echo json_encode(array('code' => -11, 'error' => $result));
             return 0;
         } else {
-            //插入成功
-            $this->session->set_userdata('user_role', '普通用户');
-            $this->session->set_userdata('user_telephone', $this->input->post('registerTele', TRUE));
-            $this->session->set_userdata('user_id', $result[1]);
-            $this->session->set_userdata('user_name', $this->input->post('registerName', TRUE));
-            
+            //录入到session中
+            $this->setUserInfoToSession($clean);
+
             echo json_encode(array('code' => 1));
             return 0;
         }
@@ -302,5 +296,21 @@ class Index extends CI_Controller{
         } else {
             echo json_encode(array('code' => 1, 'act_info' => $data));
         }
+    }
+
+    /**
+     * 录入用户信息到session中
+     *
+     * @param $arrUserInfo
+     */
+    private function setUserInfoToSession($arrUserInfo){
+        $this->load->library('session');
+
+        //写入session
+        $this->session->set_userdata('user_name', $arrUserInfo['user_name']);
+        $this->session->set_userdata('user_role', $arrUserInfo['user_role']);
+        $this->session->set_userdata('user_id',   $arrUserInfo['_id']);
+        $this->session->set_userdata('user_telephone', $arrUserInfo['user_telephone']);
+        $this->session->set_userdata('user_school',    json_encode($arrUserInfo['user_school']));
     }
 }

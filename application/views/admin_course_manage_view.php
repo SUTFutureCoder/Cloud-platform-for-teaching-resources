@@ -35,8 +35,8 @@
         </thead>
         <tbody>
         <?php $i = 1; foreach ($course_list as $courseListData): ?>
-            <tr>
-                <td><?= $i ?></td>
+            <tr id="data_course_group_id_<?= $courseListData['lesson_group_id'] ?>">
+                <td data-><?= $i ?></td>
                 <td><?= $courseListData['lesson_name'] ?></td>
                 <td><?= $courseListData['user_name'] ?></td>
                 <td><?= $courseListData['lesson_is_private'] ?></td>
@@ -130,7 +130,7 @@
             <br/>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-danger" data-delete-act-id="" id="delete_course_submit">删除</button>
+                <button type="button" class="btn btn-danger" data-delete-course-group-id="" id="delete_course_submit">删除</button>
             </div>
         </div>
     </div>
@@ -178,43 +178,11 @@
                 dom.search_submit.bind('click',  this.submitSearch);
 
                 //绑定点击修改、删除事件 (动态绑定)
-                dom.content_table.on('click', '.question-modify', this.modifyQuestion);
-                dom.content_table.on('click', '.question-delete', this.deleteQuestion);
-
-                //修改选项个数
-                dom.question_modify_modal.on('click', '#confirm_question_num', this.changeQuestionNum);
+                dom.content_table.on('click', '.course-modify', this.modifyCourse);
+                dom.content_table.on('click', '.course-delete', this.deleteCourse);
 
                 //执行删除操作
-                dom.question_delete_modal.find('#delete_question_submit').bind('click', this.deleteQuestionExec);
-            },
-
-            changeQuestionBank: function(){
-
-                //切换题库
-                var post_data = {
-                    'question_bank_name' : dom.top.find('#select-question-type').val(),
-                    'question_type'      : dom.top.find('#select-question-answer-type').val(),
-                    'page' : page
-                };
-
-                //提交
-                $.ajax({
-                    type: 'POST',
-                    url:  'admin_question_manage/getQuestionList',
-                    data: post_data,
-                    dataType: 'json',
-                    success: function (data) {
-                        if (data['code']){
-                            alert(data['error']);
-                            return;
-                        }
-                        //开始填充
-                        funcInit.displayData(data['data'], page, data['sum']);
-                    },
-                    error: function(data){
-                        alert('操作失败');
-                    }
-                });
+                dom.course_delete_modal.find('#delete_course_submit').bind('click', this.deleteCourseExec);
             },
 
             submitSearch: function () {
@@ -246,7 +214,7 @@
                 });
             },
 
-            modifyQuestion: function(){
+            modifyCourse: function(){
                 //重设表单
                 dom.question_modify_modal.find('#form_modify_question').resetForm();
 
@@ -353,25 +321,14 @@
                 });
             },
 
-            changeQuestionNum: function(){
-                dom.question_modify_modal.find('#question_choose_set').empty();
-                var questionIndicator = 65;
-                var questionNum       = dom.question_modify_modal.find('#question_num').val();
-                var strAppend         = '';
-                for (var i = 0; i < questionNum; i++, questionIndicator++){
-                    strAppend += '<label for="question_choose_' + String.fromCharCode(questionIndicator) + '" class="col-sm-2 control-label">' + String.fromCharCode(questionIndicator) + '</label><div class="col-sm-9"><input type="text" class="form-control question_choose_input" name="question_choose[]" id="question_choose_' + i + '"></div><br/><br/>';
-                }
-                dom.question_modify_modal.find('#question_choose_set').append(strAppend);
-            },
-
-            deleteQuestion: function(){
+            deleteCourse: function(){
                 var questionListId = ($(this).parent().attr('data-question-list-id') * 1) + 1;
                 dom.question_delete_modal.find('#question_delete_modal_display_id').html(questionListId);
                 dom.question_delete_modal.find('#delete_question_submit').attr('data-question-id', $(this).parent().attr('data-question-id'));
                 dom.question_delete_modal.modal('show');
             },
 
-            deleteQuestionExec: function(){
+            deleteCourseExec: function(){
                 var questionId = $(this).attr('data-question-id');
                 //ajax请求
                 $.ajax({
@@ -398,109 +355,109 @@
             },
 
             displayData: function(data, divide, sum){
-                console.log(data);
-                return 0;
                 //用于统一显示数据
-                var dataLength       = data.length;
                 var contentTableBody = dom.content_table.find('tbody');
-                var questionType     = [];
-                questionType['choose']       = '单选';
-                questionType['multi_choose'] = '多选';
-                questionType['fill']         = '填空';
-                questionType['judge']        = '判断';
 
                 contentTableBody.html('');
 
-                for (var i = 0; i < dataLength; ++i){
-                    var strData = '<tr id="data_question_id_' + data[i]['question_id'] + '"><td>' + (i + 1) + '</td>' +
-                        '<td>' + data[i]['question_content'] + '</td>' +
-                        '<td>' + questionType[data[i]['type']] + '</td>' +
-                        '<td>' + data[i]['question_type'] + '</td>' +
-                        '<td>' + data[i]['question_add_time'] + '</td>' +
-                        '<td data-question-list-id="' + i + '" data-question-type="' + data[i]['type'] + '" data-question-id="' + data[i]['question_id'] + '"><button class="btn btn-warning question-modify">修改</button><button class="btn btn-danger question-delete">删除</button></td></tr>';
+                var i = 0;
+                for (var lessonData in data){
+                    var strData = '<tr id="data_course_group_id_' + data[lessonData][0]['lesson_group_id'] + '"><td>' + (i + 1) + '</td>' +
+                        '<td>' + data[lessonData][0]['lesson_name'] + '</td>' +
+                        '<td>' + data[lessonData][0]['user_name'] + '</td>' +
+                        '<td>' + data[lessonData][0]['lesson_is_private'] + '</td>' +
+                        '<td>' + data[lessonData][0]['lesson_ctime'] + '</td>' +
+                        '<td data-course-list-id="' + i + '" data-course-id="' + data[lessonData][0]['lesson_group_id'] + '"><button class="btn btn-warning course-view" onclick="window.open(\'<?= base_url() ?>index.php/Course_join/index/' + data[lessonData][0]['lesson_group_id'] + '/1\')">预览</button><button class="btn btn-warning course-modify">修改</button><button class="btn btn-danger course-delete">删除</button></td></tr>';
                     contentTableBody.append(strData);
+                    ++i;
                 }
 
-                //如果分页,则显示页码等信息
-                if (divide){
-                    //清空分页条
-                    dom.bottom.html('');
-                    //计算一共几页
-                    var pageSum      = Math.ceil((sum * 1) / page.perpage);
-                    //算出展示的页码，5个一组，12345,34567
-                    var pageBtnShow  = 5;
-                    var firstPageBtn = 1;
-                    var lastPageBtn  = pageSum;
-                    //顶头情况
-                    if (page.page_no - 1 <= (pageBtnShow - 1) / 2){
-                        firstPageBtn = 1;
-                        if (pageBtnShow <= pageSum){
-                            lastPageBtn  = pageBtnShow;
-                        } else {
-                            lastPageBtn  = pageSum;
-                        }
-                    } else if (pageSum - page.page_no <= (pageBtnShow - 1) / 2){
-                        //结尾情况
-                        lastPageBtn  = pageSum;
-                        if (lastPageBtn  - pageBtnShow > 0){
-                            firstPageBtn = lastPageBtn - pageBtnShow + 1;
-                        } else {
-                            firstPageBtn = 1;
-                        }
-                    } else {
-                        //中间情况
-                        firstPageBtn = page.page_no * 1 - (pageBtnShow - 1) / 2;
-                        lastPageBtn  = page.page_no * 1 + (pageBtnShow - 1) / 2;
-                    }
-
-                    var strDivide = '<nav><ul class="pagination">' +
-                        '<li id="pager_prev"><a href="#" aria-label="Previous"><span aria-hidden="true">«</span></a></li>';
-
-                    for (var i = firstPageBtn; i <= lastPageBtn; ++i){
-                        strDivide += '<li class="pager_changer" id="pager_num_' + i + '" data-pager-num="' + i + '"><a href="#">' + i + ' </a></li>';
-                    }
-
-                    strDivide += '<li id="pager_next"><a href="#" aria-label="Next"><span aria-hidden="true">»</span></a></li></ul></nav>';
-                    dom.bottom.html(strDivide);
-                    //开始染色
-                    if (firstPageBtn == page.page_no){
-                        dom.bottom.find("#pager_prev").addClass('disabled');
-                        dom.bottom.find('#pager_prev').off('click');
-                    } else {
-                        //绑定上一页
-                        dom.bottom.find('#pager_prev').on('click', function(){
-                            page.page_no--;
-                            funcInit.changeQuestionBank();
-                        });
-                    }
-//
-                    if (lastPageBtn == page.page_no){
-                        dom.bottom.find('#pager_next').addClass('disabled');
-                        dom.bottom.find('#pager_next').off('click');
-                    } else {
-                        //绑定下一页
-                        dom.bottom.find('#pager_next').on('click', function(){
-                            page.page_no++;
-                            funcInit.changeQuestionBank();
-                        });
-                    }
-
-                    dom.bottom.find("#pager_num_" + page.page_no).addClass('active');
-
-                    //遍历绑定
-                    dom.bottom.find('.pager_changer').each(function () {
-                        $(this).on('click', function(){
-                            page.page_no = $(this).attr('data-pager-num');
-                            funcInit.changeQuestionBank();
-                        });
-                    });
-
-                    //显示分页条
-                    dom.bottom.show();
+                if (divide) {
+                    //进行分页
+                    funcInit.dividePage(sum);
                 } else {
                     //隐藏分页条
                     dom.bottom.hide();
                 }
+            },
+
+            dividePage : function(sum){
+                //如果分页,则显示页码等信息
+                //清空分页条
+                dom.bottom.html('');
+                //计算一共几页
+                var pageSum      = Math.ceil((sum * 1) / page.perpage);
+                //算出展示的页码，5个一组，12345,34567
+                var pageBtnShow  = 5;
+                var firstPageBtn = 1;
+                var lastPageBtn  = pageSum;
+                //顶头情况
+                if (page.page_no - 1 <= (pageBtnShow - 1) / 2){
+                    firstPageBtn = 1;
+                    if (pageBtnShow <= pageSum){
+                        lastPageBtn  = pageBtnShow;
+                    } else {
+                        lastPageBtn  = pageSum;
+                    }
+                } else if (pageSum - page.page_no <= (pageBtnShow - 1) / 2){
+                    //结尾情况
+                    lastPageBtn  = pageSum;
+                    if (lastPageBtn  - pageBtnShow > 0){
+                        firstPageBtn = lastPageBtn - pageBtnShow + 1;
+                    } else {
+                        firstPageBtn = 1;
+                    }
+                } else {
+                    //中间情况
+                    firstPageBtn = page.page_no * 1 - (pageBtnShow - 1) / 2;
+                    lastPageBtn  = page.page_no * 1 + (pageBtnShow - 1) / 2;
+                }
+
+                var strDivide = '<nav><ul class="pagination">' +
+                    '<li id="pager_prev"><a href="#" aria-label="Previous"><span aria-hidden="true">«</span></a></li>';
+
+                for (var i = firstPageBtn; i <= lastPageBtn; ++i){
+                    strDivide += '<li class="pager_changer" id="pager_num_' + i + '" data-pager-num="' + i + '"><a href="#">' + i + ' </a></li>';
+                }
+
+                strDivide += '<li id="pager_next"><a href="#" aria-label="Next"><span aria-hidden="true">»</span></a></li></ul></nav>';
+                dom.bottom.html(strDivide);
+                //开始染色
+                if (firstPageBtn == page.page_no){
+                    dom.bottom.find("#pager_prev").addClass('disabled');
+                    dom.bottom.find('#pager_prev').off('click');
+                } else {
+                    //绑定上一页
+                    dom.bottom.find('#pager_prev').on('click', function(){
+                        page.page_no--;
+                        funcInit.changeQuestionBank();
+                    });
+                }
+//
+                if (lastPageBtn == page.page_no){
+                    dom.bottom.find('#pager_next').addClass('disabled');
+                    dom.bottom.find('#pager_next').off('click');
+                } else {
+                    //绑定下一页
+                    dom.bottom.find('#pager_next').on('click', function(){
+                        page.page_no++;
+                        funcInit.changeQuestionBank();
+                    });
+                }
+
+                dom.bottom.find("#pager_num_" + page.page_no).addClass('active');
+
+                //遍历绑定
+                dom.bottom.find('.pager_changer').each(function () {
+                    $(this).on('click', function(){
+                        page.page_no = $(this).attr('data-pager-num');
+                        funcInit.changeQuestionBank();
+                    });
+                });
+
+                //显示分页条
+                dom.bottom.show();
+
             },
 
             resetPage: function(){

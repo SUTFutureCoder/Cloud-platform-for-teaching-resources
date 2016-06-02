@@ -45,7 +45,6 @@ class Admin_course_manage extends CI_Controller{
         }
 
         $this->load->model('Course_model');
-//        $arrCourseRet = $this->Course_model->searchCourse('概论', null, true);
         $arrCourseRet = $this->Course_model->searchCourse($this->input->post('search_text', true), null, true);
 
         $arrCourseGroupData = array();
@@ -70,7 +69,7 @@ class Admin_course_manage extends CI_Controller{
                 $arrCourseGroupData[$arrRetLevel0Data['lesson_group_id']][0] = $arrRetLevel0Data;
             }
         }
-//        print_r($arrCourseGroupData);
+
         echo json_encode($arrCourseGroupData);
     }
 }

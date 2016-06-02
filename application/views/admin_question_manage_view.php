@@ -219,7 +219,7 @@
     var page = {
         //分页属性
         page_no : 1,
-        perpage : 70
+        perpage : 20
     };
 
     var funcInit = {

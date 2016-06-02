@@ -132,7 +132,7 @@ class Course_model extends CI_Model{
         $this->load->database();
 
         $this->db->select('l.lesson_id, l.lesson_group_id, l.lesson_level, l.lesson_name, l.lesson_intro');
-        $this->db->from('lesson as l');
+        $this->db->from('lesson as l, lesson as l2');
         if (false === $all){
             $this->db->where('l.lesson_is_deleted', 0);
             $this->db->where('(l.lesson_is_private = 0 OR (l.lesson_is_private = 1 AND lesson_school.school_name IN ("' . implode('","', $arrSchoolName) . '")))');
@@ -142,7 +142,24 @@ class Course_model extends CI_Model{
         $this->db->limit($limit, $page * $limit);
 
         $arrCourseRet = $this->db->get()->result_array();
+
         return $arrCourseRet;
+    }
+
+    /**
+     * 根据课程组id列表获取level 0主课程
+     *
+     * 请务必在筛选一圈后使用
+     *
+     * @param $courseGroupIdList
+     */
+    public function getMainCourse($courseGroupIdList){
+        $this->load->database();
+
+        $this->db->where_in('lesson_group_id', $courseGroupIdList);
+        $this->db->where('lesson_level',       0);
+
+        return $this->db->get('lesson')->result_array();
     }
 
 }

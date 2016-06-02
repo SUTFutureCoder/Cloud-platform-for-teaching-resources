@@ -31,18 +31,46 @@ class Admin_course_manage extends CI_Controller{
     }
 
 
+    /**
+     * 搜索课程
+     */
     public function searchCourse(){
-        $this->load->model('Course_model');
+        $this->load->library('session');
+        $this->load->library('authorizee');
+        $this->load->library('util/Uuid');
 
-        $arrCourseRet = $this->Course_model->searchCourse('安全', null, true);
+        if (!$this->authorizee->CheckAuthorizee($this->session->userdata('user_role'), 'course_add')){
+            echo json_encode(array('code' => -1, 'error' => '抱歉，您的权限不足'));
+            exit;
+        }
+
+        $this->load->model('Course_model');
+//        $arrCourseRet = $this->Course_model->searchCourse('概论', null, true);
+        $arrCourseRet = $this->Course_model->searchCourse($this->input->post('search_text', true), null, true);
 
         $arrCourseGroupData = array();
 
         foreach ($arrCourseRet as $arrCourseData){
             //以group_id为key
-            $arrCourseGroupData[$arrCourseData['lesson_group_id']] = $arrCourseData;
+            $arrCourseGroupData[$arrCourseData['lesson_group_id']][$arrCourseData['lesson_level']] = $arrCourseData;
         }
 
+        //需要补充获取level0列表，即上面的查询没有查到level 0主课内容
+        $arrGetLevel0List   = array();
+        foreach ($arrCourseGroupData as $intGroupId => $arrCourseGroupDataData){
+            if (!isset($arrCourseGroupDataData[0])){
+                $arrGetLevel0List[] = $intGroupId;
+            }
+        }
 
+        //合并列表
+        if (!empty($arrGetLevel0List)){
+            $arrRetLevel0 = $this->Course_model->getMainCourse($arrGetLevel0List);
+            foreach ($arrRetLevel0 as $arrRetLevel0Data){
+                $arrCourseGroupData[$arrRetLevel0Data['lesson_group_id']][0] = $arrRetLevel0Data;
+            }
+        }
+//        print_r($arrCourseGroupData);
+        echo json_encode($arrCourseGroupData);
     }
 }

@@ -216,126 +216,126 @@
 
             modifyCourse: function(){
                 //重设表单
-                dom.question_modify_modal.find('#form_modify_question').resetForm();
+//                dom.question_modify_modal.find('#form_modify_course').resetForm();
 
-                var questionId = $(this).parent().attr('data-question-id');
-                //ajax请求
-                $.ajax({
-                    type: 'POST',
-                    url:  'admin_question_manage/getQuestionInfoById',
-                    data: {
-                        'question_id' : questionId
-                    },
-                    dataType: 'json',
-                    success: function (data) {
-                        if (data['code']){
-                            alert(data['error']);
-                            return 0;
-                        }
-                        //开始填充
-                        dom.question_modify_modal.find('#question_id').val(questionId);
-                        dom.question_modify_modal.find('.question_type_select_option').removeAttr('selected');
-                        dom.question_modify_modal.find('#question_type_select_' + data['question_type']).prop('selected', true);
-                        dom.question_modify_modal.find('#question_content').html(data['question_content']);
-
-                        //分情况
-                        if (data['type'] == 'choose' || data['type'] == 'multi_choose'){
-                            var questionNum = data['question_choose'].length;
-                            dom.question_modify_modal.find('#question_num').val(questionNum);
-                            //模拟点击，显示选项
-                            dom.question_modify_modal.find('#confirm_question_num').trigger("click");
-                            //填充选项
-                            for (var i = 0; i < questionNum; i++){
-                                dom.question_modify_modal.find('#question_choose_' + i).val(data['question_choose'][i]);
-                            }
-                            //正确答案
-                            dom.question_modify_modal.find('#question_choose_answer').val(data['question_answer'].join(' '));
-                        }
-
-                        //目前没有
-                        if (data['type'] == 'fill'){
-                            dom.question_modify_modal.find('#question_fill_answer').val(data['question_answer']);
-                        }
-
-                        if (data['type'] == 'judge'){
-                            dom.question_modify_modal.find('#question_judge').prop('checked', true);
-                            if (1 == data['question_answer']){
-                                dom.question_modify_modal.find('#question_judge_true').prop('checked', true);
-                            }
-                        }
-
-                        dom.question_modify_modal.find('#question_score').val(data['question_score']);
-
-                        if (1 == data['question_private']){
-                            dom.question_modify_modal.find('#question_private').prop('checked', true);
-                        }
-
-                        if (data['question_hint']){
-                            dom.question_modify_modal.find('#myEditor,.edui-body-container,#question_hint').html(data['question_hint']);
-                        }
-
-
-                        //绑定提交选项
-                        var options = {
-                            dataType    : "json",
-                            beforeSubmit: function (){
-                                dom.question_modify_modal.find("#submit").attr("value", "正在提交中……请稍后");
-                                dom.question_modify_modal.find("#submit").attr("disabled", "disabled");
-                            },
-                            success     : function (data){
-                                if (1 != data['code']){
-                                    alert(data['error']);
-                                } else {
-                                    alert('修改成功');
-                                    //修改信息
-                                    var content = dom.content_table.find('#data_question_id_' + questionId);
-                                    content.find('td:eq(1)').html(dom.question_modify_modal.find('#question_content').val());
-                                    if (!dom.question_modify_modal.find('#question_type_fill').val()){
-                                        content.find('td:eq(3)').html(dom.question_modify_modal.find('#question_type_select').val());
-                                    } else {
-                                        content.find('td:eq(3)').html(dom.question_modify_modal.find('#question_type_fill').val());
-                                    }
-
-                                    dom.question_modify_modal.find("#form_modify_question").resetForm();
-                                    dom.question_modify_modal.find('#myEditor').html('');
-                                }
-
-                                dom.question_modify_modal.modal('hide');
-
-                                dom.question_modify_modal.find("#submit").removeAttr("disabled");
-                                dom.question_modify_modal.find("#submit").attr("value", "修改");
-                            },
-                            error       : function (msg){
-                                console.log(msg);
-                                alert("操作失败");
-                                dom.question_modify_modal.find("#submit").removeAttr("disabled");
-                                dom.question_modify_modal.find("#submit").attr("value", "修改");
-                            }
-                        };
-                        dom.question_modify_modal.find("#form_modify_question").ajaxForm(options);
-                        dom.question_modify_modal.modal('show');
-                    },
-                    error: function(data){
-                        alert('操作失败');
-                    }
-                });
+//                var questionId = $(this).parent().attr('data-question-id');
+//                //ajax请求
+//                $.ajax({
+//                    type: 'POST',
+//                    url:  'admin_question_manage/getQuestionInfoById',
+//                    data: {
+//                        'question_id' : questionId
+//                    },
+//                    dataType: 'json',
+//                    success: function (data) {
+//                        if (data['code']){
+//                            alert(data['error']);
+//                            return 0;
+//                        }
+//                        //开始填充
+//                        dom.question_modify_modal.find('#question_id').val(questionId);
+//                        dom.question_modify_modal.find('.question_type_select_option').removeAttr('selected');
+//                        dom.question_modify_modal.find('#question_type_select_' + data['question_type']).prop('selected', true);
+//                        dom.question_modify_modal.find('#question_content').html(data['question_content']);
+//
+//                        //分情况
+//                        if (data['type'] == 'choose' || data['type'] == 'multi_choose'){
+//                            var questionNum = data['question_choose'].length;
+//                            dom.question_modify_modal.find('#question_num').val(questionNum);
+//                            //模拟点击，显示选项
+//                            dom.question_modify_modal.find('#confirm_question_num').trigger("click");
+//                            //填充选项
+//                            for (var i = 0; i < questionNum; i++){
+//                                dom.question_modify_modal.find('#question_choose_' + i).val(data['question_choose'][i]);
+//                            }
+//                            //正确答案
+//                            dom.question_modify_modal.find('#question_choose_answer').val(data['question_answer'].join(' '));
+//                        }
+//
+//                        //目前没有
+//                        if (data['type'] == 'fill'){
+//                            dom.question_modify_modal.find('#question_fill_answer').val(data['question_answer']);
+//                        }
+//
+//                        if (data['type'] == 'judge'){
+//                            dom.question_modify_modal.find('#question_judge').prop('checked', true);
+//                            if (1 == data['question_answer']){
+//                                dom.question_modify_modal.find('#question_judge_true').prop('checked', true);
+//                            }
+//                        }
+//
+//                        dom.question_modify_modal.find('#question_score').val(data['question_score']);
+//
+//                        if (1 == data['question_private']){
+//                            dom.question_modify_modal.find('#question_private').prop('checked', true);
+//                        }
+//
+//                        if (data['question_hint']){
+//                            dom.question_modify_modal.find('#myEditor,.edui-body-container,#question_hint').html(data['question_hint']);
+//                        }
+//
+//
+//                        //绑定提交选项
+//                        var options = {
+//                            dataType    : "json",
+//                            beforeSubmit: function (){
+//                                dom.question_modify_modal.find("#submit").attr("value", "正在提交中……请稍后");
+//                                dom.question_modify_modal.find("#submit").attr("disabled", "disabled");
+//                            },
+//                            success     : function (data){
+//                                if (1 != data['code']){
+//                                    alert(data['error']);
+//                                } else {
+//                                    alert('修改成功');
+//                                    //修改信息
+//                                    var content = dom.content_table.find('#data_question_id_' + questionId);
+//                                    content.find('td:eq(1)').html(dom.question_modify_modal.find('#question_content').val());
+//                                    if (!dom.question_modify_modal.find('#question_type_fill').val()){
+//                                        content.find('td:eq(3)').html(dom.question_modify_modal.find('#question_type_select').val());
+//                                    } else {
+//                                        content.find('td:eq(3)').html(dom.question_modify_modal.find('#question_type_fill').val());
+//                                    }
+//
+//                                    dom.question_modify_modal.find("#form_modify_question").resetForm();
+//                                    dom.question_modify_modal.find('#myEditor').html('');
+//                                }
+//
+//                                dom.question_modify_modal.modal('hide');
+//
+//                                dom.question_modify_modal.find("#submit").removeAttr("disabled");
+//                                dom.question_modify_modal.find("#submit").attr("value", "修改");
+//                            },
+//                            error       : function (msg){
+//                                console.log(msg);
+//                                alert("操作失败");
+//                                dom.question_modify_modal.find("#submit").removeAttr("disabled");
+//                                dom.question_modify_modal.find("#submit").attr("value", "修改");
+//                            }
+//                        };
+//                        dom.question_modify_modal.find("#form_modify_question").ajaxForm(options);
+                        dom.course_modify_modal.modal('show');
+//                    },
+//                    error: function(data){
+//                        alert('操作失败');
+//                    }
+//                });
             },
 
             deleteCourse: function(){
-                var questionListId = ($(this).parent().attr('data-question-list-id') * 1) + 1;
-                dom.question_delete_modal.find('#question_delete_modal_display_id').html(questionListId);
-                dom.question_delete_modal.find('#delete_question_submit').attr('data-question-id', $(this).parent().attr('data-question-id'));
-                dom.question_delete_modal.modal('show');
+                var courseGroupId = ($(this).parent().attr('data-course-id') * 1);
+                dom.course_delete_modal.find('#course_delete_modal_display_id').html($(this).parent().attr('data-course-list-id'));
+                dom.course_delete_modal.find('#delete_course_submit').attr('data-delete-course-group-id', courseGroupId);
+                dom.course_delete_modal.modal('show');
             },
 
             deleteCourseExec: function(){
-                var questionId = $(this).attr('data-question-id');
+                var courseId = $(this).attr('data-delete-course-group-id');
                 //ajax请求
                 $.ajax({
                     type: 'POST',
-                    url:  'admin_question_manage/deleteQuestionById',
+                    url:  'admin_course_manage/deleteCourse',
                     data: {
-                        'question_id' : questionId
+                        'lesson_group_id' : courseId
                     },
                     dataType: 'json',
                     success: function (data) {
@@ -345,8 +345,8 @@
                         }
                         alert('删除成功');
                         //开始清理
-                        dom.content_table.find('#data_question_id_' + questionId).remove();
-                        dom.question_delete_modal.modal('hide');
+                        dom.content_table.find('#data_course_group_id_' + courseId).remove();
+                        dom.course_delete_modal.modal('hide');
                     },
                     error: function(data){
                         alert('操作失败');

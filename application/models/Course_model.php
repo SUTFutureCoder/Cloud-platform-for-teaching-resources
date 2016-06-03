@@ -65,11 +65,11 @@ class Course_model extends CI_Model{
         $this->db->select('l.lesson_group_id, l.lesson_image, l.lesson_name, l.user_name, l.lesson_is_private, l.lesson_is_deleted, l.lesson_ctime');
         $this->db->from('lesson as l');
         $this->db->where('l.lesson_level', 0);
+        $this->db->where('l.lesson_is_deleted', 0);
         $this->db->limit($limit, $page * $limit);
 
         if ($normalUser){
             $this->db->join('lesson_school s', 'l.lesson_group_id=s.lesson_group_id', 'left');
-            $this->db->where('l.lesson_is_deleted', 0);
             $strWhere = '(l.lesson_is_private = 0 OR (l.lesson_is_private = 1 AND s.school_name IN ("' . implode('","', $userSchool) . '")))';
             $this->db->where($strWhere);
         }
@@ -131,10 +131,10 @@ class Course_model extends CI_Model{
     public function searchCourse($searchCourse, $arrSchoolName, $all = false, $page = 0, $limit = 20){
         $this->load->database();
 
-        $this->db->select('l.lesson_id, l.lesson_group_id, l.lesson_level, l.lesson_name, l.lesson_intro, l.lesson_is_private, l.lesson_ctime, l.user_name');
+        $this->db->select('l.lesson_id, l.lesson_group_id, l.lesson_level, l.lesson_name, l.lesson_intro, l.lesson_is_private, l.lesson_is_deleted, l.lesson_ctime, l.user_name');
         $this->db->from('lesson as l');
+        $this->db->where('l.lesson_is_deleted', 0);
         if (false === $all){
-            $this->db->where('l.lesson_is_deleted', 0);
             $this->db->where('(l.lesson_is_private = 0 OR (l.lesson_is_private = 1 AND lesson_school.school_name IN ("' . implode('","', $arrSchoolName) . '")))');
             $this->db->join('lesson_school', 'lesson_school.lesson_group_id=l.lesson_group_id', 'left');
         }
@@ -162,4 +162,18 @@ class Course_model extends CI_Model{
         return $this->db->get('lesson')->result_array();
     }
 
+    /**
+     * 通过课程组id进行删除整个课程
+     *
+     * 删除子课通过修改界面
+     *
+     * @param $intCourseGroupId
+     */
+    public function deleteCourse($intCourseGroupId){
+        $this->load->database();
+        $this->db->where('lesson_group_id', $intCourseGroupId);
+        $this->db->update(self::TABLE_NAME, array('lesson_is_deleted' => $intCourseGroupId));
+
+        return $this->db->affected_rows();
+    }
 }

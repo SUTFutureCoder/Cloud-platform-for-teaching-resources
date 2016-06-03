@@ -17,7 +17,7 @@ class Admin_course_manage extends CI_Controller{
         $this->load->library('session');
         $this->load->library('authorizee');
 
-        if (!$this->authorizee->CheckAuthorizee($this->session->userdata('user_role'), 'course_add')){
+        if (!$this->authorizee->CheckAuthorizee($this->session->userdata('user_role'), 'course_update')){
             header("Content-type: text/html; charset=utf-8");
             echo '<script>alert("抱歉，您的权限不足");window.location.href="' . base_url() . '";</script>';
             return 0;
@@ -37,9 +37,8 @@ class Admin_course_manage extends CI_Controller{
     public function searchCourse(){
         $this->load->library('session');
         $this->load->library('authorizee');
-        $this->load->library('util/Uuid');
 
-        if (!$this->authorizee->CheckAuthorizee($this->session->userdata('user_role'), 'course_add')){
+        if (!$this->authorizee->CheckAuthorizee($this->session->userdata('user_role'), 'course_update')){
             echo json_encode(array('code' => -1, 'error' => '抱歉，您的权限不足'));
             exit;
         }
@@ -71,5 +70,27 @@ class Admin_course_manage extends CI_Controller{
         }
 
         echo json_encode($arrCourseGroupData);
+    }
+
+    /**
+     * 删除课程
+     */
+    public function deleteCourse(){
+        $this->load->library('session');
+        $this->load->library('authorizee');
+
+        if (!$this->authorizee->CheckAuthorizee($this->session->userdata('user_role'), 'course_dele')){
+            echo json_encode(array('code' => -1, 'error' => '抱歉，您的权限不足'));
+            exit;
+        }
+
+        $this->load->model('Course_model');
+        if ($this->Course_model->deleteCourse($this->input->post('lesson_group_id', true))){
+            echo json_encode(array('code' => 1));
+            exit;
+        } else {
+            echo json_encode(array('code' => -2, 'error' => '抱歉，删除失败'));
+            exit;
+        }
     }
 }

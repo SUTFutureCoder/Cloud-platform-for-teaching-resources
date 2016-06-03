@@ -131,7 +131,7 @@ class Course_model extends CI_Model{
     public function searchCourse($searchCourse, $arrSchoolName, $all = false, $page = 0, $limit = 20){
         $this->load->database();
 
-        $this->db->select('l.lesson_id, l.lesson_group_id, l.lesson_level, l.lesson_name, l.lesson_intro, l.lesson_is_private, l.lesson_is_deleted, l.lesson_ctime, l.user_name');
+        $this->db->select('l.lesson_id, l.lesson_image, l.lesson_group_id, l.lesson_level, l.lesson_name, l.lesson_is_private, l.lesson_is_deleted, l.lesson_ctime, l.user_name');
         $this->db->from('lesson as l');
         $this->db->where('l.lesson_is_deleted', 0);
         if (false === $all){

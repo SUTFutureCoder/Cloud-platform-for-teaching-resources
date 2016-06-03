@@ -51,11 +51,16 @@ class Course_list extends CI_Controller{
                     $arrCourseList[$arrRetLevel0Data['lesson_group_id']][0] = $arrRetLevel0Data;
                 }
             }
+
+            //查询标记
+            $boolSearch = true;
         } else {
             $arrCourseList = $this->Course_model->getCourseList(1, $arrSchoolList, $intPage, $intLimit);
+            $boolSearch = false;
         }
 
         $this->load->view('course_list_view', array(
+            'bool_search' => $boolSearch,
             'course_list' => $arrCourseList,
         ));
     }

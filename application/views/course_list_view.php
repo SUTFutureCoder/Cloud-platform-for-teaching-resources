@@ -71,8 +71,8 @@
         <button type="submit" class="btn btn-default">搜索</button>
     </form>
 </div>
-<?= print_r($course_list) ?>
 <?php if (is_array($course_list)): ?>
+<?php if (is_array($course_list) && false === $bool_search): ?>
     <div class="row">
         <?php foreach ($course_list as $key => $value): ?>
             <div class="col-sm-6 col-md-4">
@@ -91,6 +91,32 @@
             </div>
         <?php endforeach; ?>
     </div>
+<?php else: ?>
+    <div class="row">
+        <?php foreach ($course_list as $key => $courseListData): ?>
+            <div class="col-sm-6 col-md-4">
+                <div class="thumbnail">
+                    <?php if (empty($courseListData[0]['lesson_image'])):?>
+                        <img src="img/default.jpg" alt="...">
+                    <?php else: ?>
+                        <img src="<?= $courseListData[0]['lesson_image'] ?>" alt="...">
+                    <?php endif; ?>
+                    <div class="caption">
+                        <h3><?= $courseListData[0]['lesson_name']?></h3>
+                        <p><?=  $courseListData[0]['user_name'] ?>老师</p>
+                        <p><a class="btn btn-primary" role="button" href='<?= base_url('index.php/Course_join/index/' . $courseListData[0]['lesson_group_id'] . '/1') ?>' target="_blank" ">参加课程</a></p>
+                        <hr>
+                        <?php foreach ($courseListData as $courseLevel => $courseData): ?>
+                            <?php if(0 != $courseLevel): ?>
+                                <p><a class="btn btn-primary" role="button" href='<?= base_url('index.php/Course_join/index/' . $courseListData[$courseLevel]['lesson_group_id'] . '/' . $courseListData[$courseLevel]['lesson_level']) ?>' target="_blank" ">参加第<?= $courseListData[$courseLevel]['lesson_level'] ?>节-<?= $courseListData[$courseLevel]['lesson_name'] ?></a></p>
+                            <?php endif;?>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif;?>
 <?php endif; ?>
 
 <script src="http://nws.oss-cn-qingdao.aliyuncs.com/jquery.min.js"></script>

@@ -64,7 +64,15 @@
         <br/>
         <br/>
         <br/>
-        <div class="alert alert-info" role="alert">课程列表</div>
+        <div class="alert alert-info row" role="alert">
+            <form class="form-inline col-sm-5" method="get" action="<?= base_url() . 'index.php/Course_list/'?>">
+                <div>课程列表</div>
+                <div class="form-group">
+                    <input type="text" class="form-control" name="lesson_search">
+                </div>
+                <button type="submit" class="btn btn-default">搜索</button>
+            </form>
+        </div>
         <?php if (is_array($course_list)): ?>
             <div class="row">
                 <?php foreach ($course_list as $key => $value): ?>

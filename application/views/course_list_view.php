@@ -20,7 +20,6 @@
     <style type="text/css"></style></head>
 
 <body>
-
 <!-- Fixed navbar -->
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container">
@@ -60,75 +59,39 @@
         </div><!--/.nav-collapse -->
     </div>
 </nav>
-
-<div class="container">
-    <br/>
-    <br/>
-    <br/>
-
+<br/>
+<br/>
+<br/>
+<div class="alert alert-info row" role="alert">
+    <form class="form-inline col-sm-5" method="get" action="<?= base_url() . 'index.php/Course_list/'?>">
+        <div>课程列表</div>
+        <div class="form-group">
+            <input type="text" class="form-control" name="lesson_search">
+        </div>
+        <button type="submit" class="btn btn-default">搜索</button>
+    </form>
+</div>
+<?= print_r($course_list) ?>
+<?php if (is_array($course_list)): ?>
     <div class="row">
-        <div class="col-sm-8" id="left_res">
-        <?php if('video' == $course_res['type']): $showRes = 1; ?>
-            <video controls width="100%">
-                <source src="<?= $course_res['url'] ?>" type="video/mp4">
-                <!--<source src="http://bucket.bricksfx.cn/file.php?file=a81da1b03bca4295f15c58139d85ab8396d64875" type="video/mp4">-->
-                Your browser does not support the video tag.
-            </video>
-        <?php endif;?>
-        <?php if('image' == $course_res['type']): $showRes = 1; ?>
-            <img width="100%" src="<?= $course_res['url'] ?>">
-        <?php endif; ?>
-        <?php if ('audio' == $course_res['type']): $showRes = 1; ?>
-            <audio controls width="100%">
-                <source src="<?= $course_res['url']?>">
-            </audio>
-        <?php elseif ('application' == $course_res['type'] && 'pdf' == $course_res['ext']): $showRes = 1; ?>
-            <embed width="100%" height="600px" type="application/pdf" src="<?= $course_res['url'] ?>"> </embed>
-        <?php endif;?>
-
-        <?php if (!isset($showRes)): ?>
-            <div class="panel panel-success">
-                <div class="panel-heading">
-                    <h3 class="panel-title">找不到播放器预览教学资源</h3>
-                </div>
-                <div class="panel-body">
-                    <a target="_blank" href="<?= $course_res['url'] ?>">请点击此处下载<?= $course_res['name'] ?>文档进行浏览</a>
+        <?php foreach ($course_list as $key => $value): ?>
+            <div class="col-sm-6 col-md-4">
+                <div class="thumbnail">
+                    <?php if (empty($value['lesson_image'])):?>
+                        <img src="img/default.jpg" alt="...">
+                    <?php else: ?>
+                        <img src="<?= $value['lesson_image'] ?>" alt="...">
+                    <?php endif; ?>
+                    <div class="caption">
+                        <h3><?= $value['lesson_name']?></h3>
+                        <p><?=  $value['user_name'] ?>老师</p>
+                        <p><a class="btn btn-primary" role="button" href='<?= base_url('index.php/Course_join/index/' . $value['lesson_group_id'] . '/1') ?>' target="_blank" ">参加课程</a></p>
+                    </div>
                 </div>
             </div>
-        <?php endif; ?>
-        </div>
-        <div class="col-sm-4" id="right_res">
-            <ul class="list-group">
-                <a class="list-group-item active">随堂资料</a>
-                <?php foreach ($course_attach as $courseAttachValue): ?>
-                    <a class="list-group-item" target="_Blank" href="<?= $courseAttachValue['url'] ?>"><?= $courseAttachValue['name'] ?></a>
-                <?php endforeach; ?>
-            </ul>
-        </div>
+        <?php endforeach; ?>
     </div>
-    <div class="panel panel-primary">
-        <div class="panel-heading"><?= $course_info[0]['lesson_name'] ?></div>
-        <div class="panel-body">
-            <?= $course_info[0]['lesson_intro'] ?>
-        </div>
-        <table class="table table-hover">
-            <th>子课程列表</th>
-            <?php $sizeCourse = count($course_info);
-                for ($i = 1; $i < $sizeCourse; ++$i): ?>
-                <tr>
-                    <?php if ($i == $course_level): ?>
-                        <td class="success">
-                    <?php else: ?>
-                        <td>
-                    <?php endif; ?>
-                <a href="<?= base_url('index.php/Course_join/index/' . $course_info[$i]['lesson_group_id'] . '/' . $i)  ?>"><?= $course_info[$i]['lesson_name'] ?></a></td></tr>
-            <?php endfor; ?>
-        </table>
-    </div>
-    <div>
-
-    </div>
-</div>
+<?php endif; ?>
 
 <script src="http://nws.oss-cn-qingdao.aliyuncs.com/jquery.min.js"></script>
 <script src="http://nws.oss-cn-qingdao.aliyuncs.com/bootstrap.min.js"></script>
